@@ -1,6 +1,7 @@
 import { useIsFetching } from "@tanstack/react-query";
 import { Link } from "react-router";
 
+import { BackendStatus } from "@/features/system/components/BackendStatus";
 import { env } from "@/lib/config/env";
 
 export function HomePage() {
@@ -27,8 +28,9 @@ export function HomePage() {
                         </h1>
 
                         <p className="mt-3 max-w-2xl text-sm leading-6 text-text-secondary sm:text-base">
-                            Course-based AI learning workspace for documents, cited answers,
-                            quizzes, flashcards and revision.
+                            Course-based AI learning workspace for
+                            documents, cited answers, quizzes,
+                            flashcards and revision.
                         </p>
                     </div>
                 </header>
@@ -55,10 +57,8 @@ export function HomePage() {
                     </article>
                 </div>
 
-                <div className="mt-6 rounded-xl border border-ai-100 bg-ai-50 px-4 py-3">
-                    <p className="text-sm font-medium text-ai-700">
-                        Router and TanStack Query providers loaded successfully.
-                    </p>
+                <div className="mt-6">
+                    <BackendStatus />
                 </div>
 
                 <nav
@@ -80,7 +80,7 @@ export function HomePage() {
                     </Link>
                 </nav>
 
-                <p className="mt-6 text-sm text-text-muted">
+                <p className="mt-6 break-all text-sm text-text-muted">
                     Backend API: {env.apiBaseUrl}
                 </p>
             </section>
