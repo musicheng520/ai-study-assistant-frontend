@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+    /* Typography */
+    --font-sans:
+            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+            "Segoe UI", sans-serif;
+
+    /* Primary brand: academic navy / indigo */
+    --color-brand-50: #eff6ff;
+    --color-brand-100: #dbeafe;
+    --color-brand-200: #bfdbfe;
+    --color-brand-500: #3b82f6;
+    --color-brand-600: #2563eb;
+    --color-brand-700: #1d4ed8;
+    --color-brand-800: #1e3a8a;
+    --color-brand-900: #172554;
+
+    /* AI accent */
+    --color-ai-50: #f5f3ff;
+    --color-ai-100: #ede9fe;
+    --color-ai-500: #8b5cf6;
+    --color-ai-600: #7c3aed;
+    --color-ai-700: #6d28d9;
+
+    /* Semantic surfaces */
+    --color-canvas: #f8fafc;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f1f5f9;
+    --color-line: #e2e8f0;
+
+    /* Semantic text */
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted: #64748b;
+
+    /* Component tokens */
+    --radius-card: 0.875rem;
+    --shadow-card:
+            0 1px 2px rgb(15 23 42 / 0.04),
+            0 8px 24px rgb(15 23 42 / 0.04);
+
+    /* 1440px wide desktop boundary */
+    --breakpoint-wide: 90rem;
+}
+
+@layer base {
+    html {
+        min-width: 320px;
+        min-height: 100%;
+        background: var(--color-canvas);
+    }
+
+    body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background: var(--color-canvas);
+        color: var(--color-text-primary);
+        font-family: var(--font-sans);
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    #root {
+        min-height: 100vh;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        font: inherit;
+    }
+
+    ::selection {
+        background: var(--color-brand-100);
+        color: var(--color-brand-900);
+    }
+}
