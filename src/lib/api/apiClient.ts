@@ -1,7 +1,8 @@
 import axios from "axios";
 
-import { authStorage } from "@/lib/auth/authStorage.ts";
-import { env } from "@/lib/config/env.ts";
+import { notifyAuthSessionExpired } from "@/features/auth/session/authSessionEvents";
+import { authStorage } from "@/lib/auth/authStorage";
+import { env } from "@/lib/config/env";
 import { toApiError } from "@/lib/errors/ApiError";
 
 export const apiClient = axios.create({
@@ -13,7 +14,8 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-    const accessToken = authStorage.getAccessToken();
+    const accessToken =
+        authStorage.getAccessToken();
 
     if (accessToken) {
         config.headers.set(
@@ -25,7 +27,43 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
+function isPublicAuthRequest(
+    requestUrl?: string,
+): boolean {
+    if (!requestUrl) {
+        return false;
+    }
+
+    const urlWithoutQuery =
+        requestUrl.split("?")[0];
+
+    return (
+        urlWithoutQuery.endsWith(
+            "/api/auth/login",
+        ) ||
+        urlWithoutQuery.endsWith(
+            "/api/auth/register",
+        )
+    );
+}
+
 apiClient.interceptors.response.use(
     (response) => response,
-    (error: unknown) => Promise.reject(toApiError(error)),
+
+    (error: unknown) => {
+        const apiError = toApiError(error);
+
+        if (
+            apiError.status === 401 &&
+            authStorage.getAccessToken() &&
+            axios.isAxiosError(error) &&
+            !isPublicAuthRequest(
+                error.config?.url,
+            )
+        ) {
+            notifyAuthSessionExpired();
+        }
+
+        return Promise.reject(apiError);
+    },
 );

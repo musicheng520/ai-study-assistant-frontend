@@ -2,7 +2,7 @@ import {
     ChevronDown,
     LogOut,
     Settings,
-    UserRound,
+    ShieldCheck,
 } from "lucide-react";
 import {
     useEffect,
@@ -10,41 +10,77 @@ import {
     useRef,
     useState,
 } from "react";
-import { Link } from "react-router";
+import {
+    Link,
+    useNavigate,
+} from "react-router";
 
+import { Badge } from "@/components/ui";
+import { useAuth } from "@/features/auth/context";
+import {
+    getUserInitials,
+    getUserRoleLabel,
+} from "@/features/auth/model";
 import { cn } from "@/lib/utils/cn";
 
 export function UserMenuShell() {
-    const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const triggerRef = useRef<HTMLButtonElement>(null);
+    const {
+        user,
+        signOut,
+    } = useAuth();
 
-    const menuId = useId();
+    const [
+        isOpen,
+        setIsOpen,
+    ] = useState(false);
+
+    const [
+        isSigningOut,
+        setIsSigningOut,
+    ] = useState(false);
+
+    const containerRef =
+        useRef<HTMLDivElement>(null);
+
+    const triggerRef =
+        useRef<HTMLButtonElement>(null);
+
+    const panelId = useId();
 
     useEffect(() => {
         if (!isOpen) {
             return;
         }
 
-        function handlePointerDown(event: PointerEvent) {
+        function handlePointerDown(
+            event: PointerEvent,
+        ) {
             const target = event.target;
 
             if (!(target instanceof Node)) {
                 return;
             }
 
-            if (!containerRef.current?.contains(target)) {
+            if (
+                !containerRef.current?.contains(
+                    target,
+                )
+            ) {
                 setIsOpen(false);
             }
         }
 
-        function handleKeyDown(event: KeyboardEvent) {
+        function handleKeyDown(
+            event: KeyboardEvent,
+        ) {
             if (event.key !== "Escape") {
                 return;
             }
 
             setIsOpen(false);
+
             triggerRef.current?.focus();
         }
 
@@ -71,19 +107,46 @@ export function UserMenuShell() {
         };
     }, [isOpen]);
 
+    if (!user) {
+        return null;
+    }
+
+    const initials =
+        getUserInitials(user);
+
+    const roleLabel =
+        getUserRoleLabel(user.role);
+
+    async function handleSignOut(): Promise<void> {
+        if (isSigningOut) {
+            return;
+        }
+
+        setIsSigningOut(true);
+        setIsOpen(false);
+
+        await signOut();
+
+        navigate("/login", {
+            replace: true,
+        });
+    }
+
     return (
         <div
-            className="relative"
             ref={containerRef}
+            className="relative"
         >
             <button
                 ref={triggerRef}
-                aria-controls={menuId}
+                aria-controls={panelId}
                 aria-expanded={isOpen}
-                aria-haspopup="menu"
+                aria-label={`Open account options for ${
+                    user.displayName || user.email
+                }`}
                 className={cn(
                     [
-                        "flex items-center gap-2",
+                        "flex min-w-0 items-center gap-2",
                         "rounded-xl border border-line",
                         "bg-surface px-2 py-1.5",
                         "text-left transition-colors",
@@ -95,30 +158,38 @@ export function UserMenuShell() {
                     isOpen && "bg-surface-muted",
                 )}
                 onClick={() => {
-                    setIsOpen((currentValue) => !currentValue);
+                    setIsOpen(
+                        (currentValue) =>
+                            !currentValue,
+                    );
                 }}
                 type="button"
             >
         <span
-            className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-100 text-brand-800"
+            className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-100 text-xs font-semibold text-brand-800"
             aria-hidden="true"
         >
-          <UserRound className="size-4" />
+          {initials}
         </span>
 
                 <span className="hidden min-w-0 sm:block">
-          <span className="block max-w-32 truncate text-sm font-medium text-text-primary">
-            Student account
+          <span className="block max-w-36 truncate text-sm font-medium text-text-primary">
+            {user.displayName ||
+                "Account"}
           </span>
 
-          <span className="block max-w-32 truncate text-xs text-text-muted">
-            Auth pending
+          <span className="block max-w-36 truncate text-xs text-text-muted">
+            {user.email}
           </span>
         </span>
 
                 <ChevronDown
                     className={cn(
-                        "size-4 text-text-muted transition-transform",
+                        [
+                            "size-4 shrink-0",
+                            "text-text-muted",
+                            "transition-transform",
+                        ],
                         isOpen && "rotate-180",
                     )}
                     aria-hidden="true"
@@ -127,42 +198,95 @@ export function UserMenuShell() {
 
             {isOpen ? (
                 <div
-                    id={menuId}
-                    className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-surface shadow-card"
-                    role="menu"
-                    aria-label="Account menu"
+                    id={panelId}
+                    className={[
+                        "absolute right-0 z-50 mt-2",
+                        "w-[min(19rem,calc(100vw-2rem))]",
+                        "overflow-hidden rounded-xl",
+                        "border border-line bg-surface",
+                        "shadow-card",
+                    ].join(" ")}
+                    aria-label="Account options"
                 >
-                    <div className="border-b border-line px-4 py-3">
-                        <p className="text-sm font-medium text-text-primary">
-                            Student account
-                        </p>
+                    <div className="border-b border-line p-4">
+                        <div className="flex items-start gap-3">
+                            <div
+                                className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-100 text-sm font-semibold text-brand-800"
+                                aria-hidden="true"
+                            >
+                                {initials}
+                            </div>
 
-                        <p className="mt-1 text-xs leading-5 text-text-muted">
-                            Real user information will be loaded from
-                            the authentication API in M58.
-                        </p>
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold text-text-primary">
+                                    {user.displayName ||
+                                        "Account"}
+                                </p>
+
+                                <p className="mt-0.5 truncate text-xs text-text-muted">
+                                    {user.email}
+                                </p>
+
+                                <Badge
+                                    className="mt-2"
+                                    variant={
+                                        user.role === "ADMIN"
+                                            ? "ai"
+                                            : "info"
+                                    }
+                                >
+                                    <ShieldCheck
+                                        className="size-3.5"
+                                        aria-hidden="true"
+                                    />
+
+                                    {roleLabel}
+                                </Badge>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="p-1.5">
                         <Link
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition hover:bg-surface-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-brand-600"
+                            className={[
+                                "flex w-full items-center gap-3",
+                                "rounded-lg px-3 py-2.5",
+                                "text-sm text-text-secondary",
+                                "transition-colors",
+                                "hover:bg-surface-muted",
+                                "hover:text-text-primary",
+                                "focus-visible:outline-2",
+                                "focus-visible:outline-brand-600",
+                            ].join(" ")}
                             onClick={() => {
                                 setIsOpen(false);
                             }}
-                            role="menuitem"
                             to="/account"
                         >
                             <Settings
                                 className="size-4"
                                 aria-hidden="true"
                             />
+
                             Account settings
                         </Link>
 
                         <button
-                            className="flex w-full cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-text-muted opacity-60"
-                            disabled
-                            role="menuitem"
+                            className={[
+                                "flex w-full items-center gap-3",
+                                "rounded-lg px-3 py-2.5",
+                                "text-left text-sm text-red-700",
+                                "transition-colors",
+                                "hover:bg-red-50",
+                                "focus-visible:outline-2",
+                                "focus-visible:outline-red-600",
+                                "disabled:cursor-not-allowed",
+                                "disabled:opacity-60",
+                            ].join(" ")}
+                            disabled={isSigningOut}
+                            onClick={() => {
+                                void handleSignOut();
+                            }}
                             type="button"
                         >
                             <LogOut
@@ -170,13 +294,9 @@ export function UserMenuShell() {
                                 aria-hidden="true"
                             />
 
-                            <span className="flex-1">
-                Sign out
-              </span>
-
-                            <span className="text-xs">
-                M58
-              </span>
+                            {isSigningOut
+                                ? "Signing out..."
+                                : "Sign out"}
                         </button>
                     </div>
                 </div>

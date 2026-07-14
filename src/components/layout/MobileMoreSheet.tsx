@@ -1,16 +1,27 @@
 import {
     GraduationCap,
     LogOut,
+    ShieldCheck,
     X,
 } from "lucide-react";
 import {
     useEffect,
     useId,
     useRef,
+    useState,
 } from "react";
-import { Link } from "react-router";
+import {
+    Link,
+    useNavigate,
+} from "react-router";
 
 import { secondaryNavigationItems } from "@/app/navigation/navigation";
+import { Badge } from "@/components/ui";
+import { useAuth } from "@/features/auth/context";
+import {
+    getUserInitials,
+    getUserRoleLabel,
+} from "@/features/auth/model";
 
 const focusableSelector = [
     "a[href]",
@@ -30,8 +41,23 @@ export function MobileMoreSheet({
                                     isOpen,
                                     onClose,
                                 }: MobileMoreSheetProps) {
-    const panelRef = useRef<HTMLElement>(null);
-    const closeButtonRef = useRef<HTMLButtonElement>(null);
+    const navigate = useNavigate();
+
+    const {
+        user,
+        signOut,
+    } = useAuth();
+
+    const [
+        isSigningOut,
+        setIsSigningOut,
+    ] = useState(false);
+
+    const panelRef =
+        useRef<HTMLElement>(null);
+
+    const closeButtonRef =
+        useRef<HTMLButtonElement>(null);
 
     const titleId = useId();
     const descriptionId = useId();
@@ -42,18 +68,22 @@ export function MobileMoreSheet({
         }
 
         const previouslyFocusedElement =
-            document.activeElement instanceof HTMLElement
+            document.activeElement instanceof
+            HTMLElement
                 ? document.activeElement
                 : null;
 
         const previousBodyOverflow =
             document.body.style.overflow;
 
-        document.body.style.overflow = "hidden";
+        document.body.style.overflow =
+            "hidden";
 
         closeButtonRef.current?.focus();
 
-        function handleKeyDown(event: KeyboardEvent) {
+        function handleKeyDown(
+            event: KeyboardEvent,
+        ) {
             if (event.key === "Escape") {
                 event.preventDefault();
                 onClose();
@@ -64,7 +94,8 @@ export function MobileMoreSheet({
                 return;
             }
 
-            const panel = panelRef.current;
+            const panel =
+                panelRef.current;
 
             if (!panel) {
                 return;
@@ -77,20 +108,32 @@ export function MobileMoreSheet({
                     ),
                 );
 
-            if (focusableElements.length === 0) {
+            if (
+                focusableElements.length === 0
+            ) {
                 event.preventDefault();
                 return;
             }
 
-            const firstElement = focusableElements[0];
+            const firstElement =
+                focusableElements[0];
+
             const lastElement =
                 focusableElements[
                 focusableElements.length - 1
                     ];
 
             if (
+                !firstElement ||
+                !lastElement
+            ) {
+                return;
+            }
+
+            if (
                 event.shiftKey &&
-                document.activeElement === firstElement
+                document.activeElement ===
+                firstElement
             ) {
                 event.preventDefault();
                 lastElement.focus();
@@ -99,7 +142,8 @@ export function MobileMoreSheet({
 
             if (
                 !event.shiftKey &&
-                document.activeElement === lastElement
+                document.activeElement ===
+                lastElement
             ) {
                 event.preventDefault();
                 firstElement.focus();
@@ -122,10 +166,37 @@ export function MobileMoreSheet({
 
             previouslyFocusedElement?.focus();
         };
-    }, [isOpen, onClose]);
+    }, [
+        isOpen,
+        onClose,
+    ]);
 
     if (!isOpen) {
         return null;
+    }
+
+    const initials = user
+        ? getUserInitials(user)
+        : "AS";
+
+    const roleLabel = user
+        ? getUserRoleLabel(user.role)
+        : null;
+
+    async function handleSignOut(): Promise<void> {
+        if (isSigningOut) {
+            return;
+        }
+
+        setIsSigningOut(true);
+
+        await signOut();
+
+        onClose();
+
+        navigate("/login", {
+            replace: true,
+        });
     }
 
     return (
@@ -141,7 +212,13 @@ export function MobileMoreSheet({
                 aria-describedby={descriptionId}
                 aria-labelledby={titleId}
                 aria-modal="true"
-                className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-line bg-surface shadow-2xl"
+                className={[
+                    "absolute inset-x-0 bottom-0",
+                    "max-h-[85vh] overflow-y-auto",
+                    "rounded-t-3xl",
+                    "border-t border-line",
+                    "bg-surface shadow-2xl",
+                ].join(" ")}
                 role="dialog"
             >
                 <div
@@ -169,7 +246,17 @@ export function MobileMoreSheet({
                     <button
                         ref={closeButtonRef}
                         aria-label="Close more menu"
-                        className="grid size-10 shrink-0 place-items-center rounded-xl text-text-secondary transition hover:bg-surface-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                        className={[
+                            "grid size-10 shrink-0",
+                            "place-items-center rounded-xl",
+                            "text-text-secondary",
+                            "transition-colors",
+                            "hover:bg-surface-muted",
+                            "hover:text-text-primary",
+                            "focus-visible:outline-2",
+                            "focus-visible:outline-offset-2",
+                            "focus-visible:outline-brand-600",
+                        ].join(" ")}
                         onClick={onClose}
                         type="button"
                     >
@@ -181,27 +268,69 @@ export function MobileMoreSheet({
                 </header>
 
                 <div className="p-4">
-                    <div className="rounded-2xl border border-line bg-canvas p-4">
-                        <div className="flex items-start gap-3">
-                            <div
-                                className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-800 text-white"
-                                aria-hidden="true"
-                            >
-                                <GraduationCap className="size-5" />
-                            </div>
+                    {user ? (
+                        <div className="rounded-2xl border border-line bg-canvas p-4">
+                            <div className="flex items-start gap-3">
+                                <div
+                                    className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-100 text-sm font-semibold text-brand-800"
+                                    aria-hidden="true"
+                                >
+                                    {initials}
+                                </div>
 
-                            <div className="min-w-0">
-                                <p className="font-medium text-text-primary">
-                                    AI Study Assistant
-                                </p>
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate font-semibold text-text-primary">
+                                        {user.displayName ||
+                                            "Account"}
+                                    </p>
 
-                                <p className="mt-1 text-sm leading-6 text-text-secondary">
-                                    Course-based learning workspace for
-                                    documents, practice and revision.
-                                </p>
+                                    <p className="mt-0.5 truncate text-sm text-text-secondary">
+                                        {user.email}
+                                    </p>
+
+                                    {roleLabel ? (
+                                        <Badge
+                                            className="mt-2"
+                                            variant={
+                                                user.role === "ADMIN"
+                                                    ? "ai"
+                                                    : "info"
+                                            }
+                                        >
+                                            <ShieldCheck
+                                                className="size-3.5"
+                                                aria-hidden="true"
+                                            />
+
+                                            {roleLabel}
+                                        </Badge>
+                                    ) : null}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="rounded-2xl border border-line bg-canvas p-4">
+                            <div className="flex items-start gap-3">
+                                <div
+                                    className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-800 text-white"
+                                    aria-hidden="true"
+                                >
+                                    <GraduationCap className="size-5" />
+                                </div>
+
+                                <div>
+                                    <p className="font-medium text-text-primary">
+                                        AI Study Assistant
+                                    </p>
+
+                                    <p className="mt-1 text-sm leading-6 text-text-secondary">
+                                        Authentication information is
+                                        currently unavailable.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <nav
                         className="mt-4"
@@ -219,7 +348,17 @@ export function MobileMoreSheet({
                                     return (
                                         <li key={item.to}>
                                             <Link
-                                                className="flex items-center gap-3 rounded-xl px-3 py-3 text-text-secondary transition hover:bg-surface-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                                                className={[
+                                                    "flex items-center gap-3",
+                                                    "rounded-xl px-3 py-3",
+                                                    "text-text-secondary",
+                                                    "transition-colors",
+                                                    "hover:bg-surface-muted",
+                                                    "hover:text-text-primary",
+                                                    "focus-visible:outline-2",
+                                                    "focus-visible:outline-offset-2",
+                                                    "focus-visible:outline-brand-600",
+                                                ].join(" ")}
                                                 onClick={onClose}
                                                 to={item.to}
                                             >
@@ -249,12 +388,26 @@ export function MobileMoreSheet({
 
                     <div className="mt-4 border-t border-line pt-4">
                         <button
-                            className="flex w-full cursor-not-allowed items-center gap-3 rounded-xl px-3 py-3 text-left text-text-muted opacity-60"
-                            disabled
+                            className={[
+                                "flex w-full items-center gap-3",
+                                "rounded-xl px-3 py-3",
+                                "text-left text-red-700",
+                                "transition-colors",
+                                "hover:bg-red-50",
+                                "focus-visible:outline-2",
+                                "focus-visible:outline-offset-2",
+                                "focus-visible:outline-red-600",
+                                "disabled:cursor-not-allowed",
+                                "disabled:opacity-60",
+                            ].join(" ")}
+                            disabled={isSigningOut}
+                            onClick={() => {
+                                void handleSignOut();
+                            }}
                             type="button"
                         >
               <span
-                  className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-muted"
+                  className="grid size-10 shrink-0 place-items-center rounded-xl bg-red-50 text-red-700"
                   aria-hidden="true"
               >
                 <LogOut className="size-5" />
@@ -262,11 +415,14 @@ export function MobileMoreSheet({
 
                             <span className="min-w-0 flex-1">
                 <span className="block text-sm font-medium">
-                  Sign out
+                  {isSigningOut
+                      ? "Signing out..."
+                      : "Sign out"}
                 </span>
 
-                <span className="mt-0.5 block text-xs">
-                  Authentication integration arrives in M58.
+                <span className="mt-0.5 block text-xs text-red-600">
+                  Clear the current session
+                  from this browser.
                 </span>
               </span>
                         </button>
