@@ -12,7 +12,7 @@ import { ProtectedRoute } from "@/features/auth/routing/ProtectedRoute";
 import { CourseLayout } from "@/features/courses/layouts/CourseLayout";
 import { CourseOverviewPage } from "@/features/courses/pages/CourseOverviewPage";
 import { CoursesPage } from "@/features/courses/pages/CoursesPage";
-import { DocumentsPlaceholderPage } from "@/features/courses/pages/DocumentsPlaceholderPage";
+import { DocumentsPage } from "@/features/documents/pages/DocumentsPage";
 import { HomePage } from "@/features/home/pages/HomePage";
 import { OverallProgressPage } from "@/features/progress/pages/OverallProgressPage";
 
@@ -60,7 +60,7 @@ export const router = createBrowserRouter([
                                     {
                                         path: "documents",
                                         element:
-                                            <DocumentsPlaceholderPage />,
+                                            <DocumentsPage />,
                                         handle:
                                             appRouteHandle(
                                                 "Documents",

@@ -33,17 +33,30 @@ export const queryKeys = {
     documents: {
         all: ["documents"] as const,
 
-        lists: () => [...queryKeys.documents.all, "list"] as const,
+        lists: () =>
+            [...queryKeys.documents.all, "list"] as const,
 
         list: (courseId: number) =>
-            [...queryKeys.documents.lists(), { courseId }] as const,
+            [
+                ...queryKeys.documents.lists(),
+                {
+                    courseId,
+                },
+            ] as const,
 
-        details: () => [...queryKeys.documents.all, "detail"] as const,
+        details: () =>
+            [...queryKeys.documents.all, "detail"] as const,
 
         detail: (documentId: number) =>
-            [...queryKeys.documents.details(), documentId] as const,
+            [
+                ...queryKeys.documents.details(),
+                documentId,
+            ] as const,
 
         status: (documentId: number) =>
-            [...queryKeys.documents.detail(documentId), "status"] as const,
+            [
+                ...queryKeys.documents.detail(documentId),
+                "status",
+            ] as const,
     },
 } as const;
