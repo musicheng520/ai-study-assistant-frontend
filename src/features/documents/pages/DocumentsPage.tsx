@@ -25,7 +25,7 @@ import {
     CardContent,
     Input,
 } from "@/components/ui";
-import { useCourseContext } from "@/features/courses/layouts/CourseLayout";
+import { useCourseContext } from "@/features/courses/context/course-context";
 import { useDocumentsQuery } from "@/features/documents/api";
 import {
     DeleteDocumentDialog,

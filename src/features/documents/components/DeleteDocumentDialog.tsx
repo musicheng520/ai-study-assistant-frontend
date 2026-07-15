@@ -3,7 +3,6 @@ import {
     Trash2,
 } from "lucide-react";
 import {
-    useEffect,
     useState,
 } from "react";
 
@@ -46,11 +45,15 @@ export function DeleteDocumentDialog({
         setDeletionError,
     ] = useState<ApiError | null>(null);
 
-    useEffect(() => {
-        if (open) {
+    function handleDialogOpenChange(
+        nextOpen: boolean,
+    ) {
+        if (nextOpen) {
             setDeletionError(null);
         }
-    }, [open]);
+
+        onOpenChange(nextOpen);
+    }
 
     async function handleDelete(): Promise<void> {
         if (!document) {
@@ -65,7 +68,7 @@ export function DeleteDocumentDialog({
                 documentId: document.id,
             });
 
-            onOpenChange(false);
+            handleDialogOpenChange(false);
             onDeleted?.(document.id);
         } catch (error) {
             setDeletionError(
@@ -77,7 +80,7 @@ export function DeleteDocumentDialog({
     return (
         <Dialog
             open={open}
-            onOpenChange={onOpenChange}
+            onOpenChange={handleDialogOpenChange}
             preventClose={
                 deleteMutation.isPending
             }
@@ -124,7 +127,7 @@ export function DeleteDocumentDialog({
                     }
                     variant="secondary"
                     onClick={() => {
-                        onOpenChange(false);
+                        handleDialogOpenChange(false);
                     }}
                 >
                     Cancel

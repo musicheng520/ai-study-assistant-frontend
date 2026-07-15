@@ -6,8 +6,11 @@ export {
 export {
     Button,
     type ButtonProps,
-    buttonVariants,
 } from "./button";
+
+export {
+    buttonVariants,
+} from "./button-variants";
 
 export {
     Card,

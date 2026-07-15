@@ -88,9 +88,17 @@ export function AuthProvider({
             currentUserQuery.error,
         );
 
-        if (apiError.status === 401) {
-            expireSession();
+        if (apiError.status !== 401) {
+            return;
         }
+
+        const timeoutId = window.setTimeout(() => {
+            expireSession();
+        }, 0);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+        };
     }, [
         currentUserQuery.error,
         currentUserQuery.isError,

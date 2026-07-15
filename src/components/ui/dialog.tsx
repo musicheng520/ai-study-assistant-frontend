@@ -50,8 +50,13 @@ export function Dialog({
     const titleId = useId();
     const descriptionId = useId();
 
-    onOpenChangeRef.current = onOpenChange;
-    preventCloseRef.current = preventClose;
+    useEffect(() => {
+        onOpenChangeRef.current = onOpenChange;
+        preventCloseRef.current = preventClose;
+    }, [
+        onOpenChange,
+        preventClose,
+    ]);
 
     function requestClose() {
         if (preventCloseRef.current) {

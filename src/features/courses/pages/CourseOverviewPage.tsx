@@ -29,7 +29,7 @@ import {
 } from "@/components/ui";
 import { useCourseOverviewQuery } from "@/features/courses/api";
 import { CourseOverviewSkeleton } from "@/features/courses/components/CourseOverviewSkeleton";
-import { useCourseContext } from "@/features/courses/layouts/CourseLayout";
+import { useCourseContext } from "@/features/courses/context/course-context";
 import { cn } from "@/lib/utils/cn";
 
 type MetricCardProps = {

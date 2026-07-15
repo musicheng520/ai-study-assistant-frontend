@@ -13,7 +13,6 @@ import {
     NavLink,
     Outlet,
     useNavigate,
-    useOutletContext,
     useParams,
 } from "react-router";
 
@@ -32,17 +31,9 @@ import {
 import { useCourseDetailQuery } from "@/features/courses/api";
 import { CourseFormDialog } from "@/features/courses/components/CourseFormDialog";
 import { DeleteCourseDialog } from "@/features/courses/components/DeleteCourseDialog";
-import type { Course } from "@/features/courses/model";
 import { toApiError } from "@/lib/errors/ApiError";
 import { cn } from "@/lib/utils/cn";
 
-type CourseOutletContext = {
-    course: Course;
-};
-
-export function useCourseContext() {
-    return useOutletContext<CourseOutletContext>();
-}
 
 function parseCourseId(
     value: string | undefined,
