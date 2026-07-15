@@ -37,11 +37,11 @@ export const chatCitationSchema = z.object({
     createdAt: z.string().optional(),
 });
 
-export const chatMessageSchema = z.object({
+const rawChatMessageSchema = z.object({
     id: z.number(),
-    sessionId: z.number(),
+    sessionId: z.number().optional(),
     userId: z.number().optional(),
-    courseId: z.number(),
+    courseId: z.number().optional(),
     role: z.enum([
         "USER",
         "ASSISTANT",
@@ -53,6 +53,37 @@ export const chatMessageSchema = z.object({
     citations: z.array(chatCitationSchema).default([]),
     createdAt: z.string(),
 });
+
+export const chatMessageSchema =
+    rawChatMessageSchema.transform(
+        (value, ctx) => {
+            if (value.sessionId === undefined) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message:
+                        "Chat message must include sessionId when parsed directly.",
+                });
+
+                return z.NEVER;
+            }
+
+            if (value.courseId === undefined) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message:
+                        "Chat message must include courseId when parsed directly.",
+                });
+
+                return z.NEVER;
+            }
+
+            return {
+                ...value,
+                sessionId: value.sessionId,
+                courseId: value.courseId,
+            };
+        },
+    );
 
 const rawChatSessionSummarySchema = z.object({
     id: z.number().optional(),
@@ -117,7 +148,7 @@ const rawChatSessionDetailSchema = z.object({
     documentId: nullableNumberSchema,
     createdAt: z.string(),
     updatedAt: z.string(),
-    messages: z.array(chatMessageSchema).default([]),
+    messages: z.array(rawChatMessageSchema).default([]),
 });
 
 export const chatSessionDetailSchema =
@@ -146,7 +177,17 @@ export const chatSessionDetailSchema =
                 documentId: value.documentId,
                 createdAt: value.createdAt,
                 updatedAt: value.updatedAt,
-                messages: value.messages,
+                messages: value.messages.map(
+                    (message) => ({
+                        ...message,
+                        sessionId:
+                            message.sessionId ??
+                            id,
+                        courseId:
+                            message.courseId ??
+                            value.courseId,
+                    }),
+                ),
             };
         },
     );

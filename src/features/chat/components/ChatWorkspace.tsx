@@ -8,7 +8,11 @@ import {
 
 import { Card } from "@/components/ui";
 
-import { useCourseChatSessionsQuery } from "../api";
+import {
+    useChatSessionQuery,
+    useCourseChatSessionsQuery,
+} from "../api";
+import { ChatMessageList } from "./ChatMessageList";
 import { ChatSessionList } from "./ChatSessionList";
 
 function parseRouteNumber(
@@ -30,6 +34,17 @@ function parseRouteNumber(
     return parsed;
 }
 
+function getErrorMessage(error: unknown) {
+    if (
+        error instanceof Error &&
+        error.message
+    ) {
+        return error.message;
+    }
+
+    return "Something went wrong while loading this chat session.";
+}
+
 export function ChatWorkspace() {
     const params = useParams();
     const navigate = useNavigate();
@@ -38,6 +53,9 @@ export function ChatWorkspace() {
         () => parseRouteNumber(params.courseId),
         [params.courseId],
     );
+
+    const hasSessionRouteParam =
+        params.sessionId !== undefined;
 
     const selectedSessionId = useMemo(
         () => parseRouteNumber(params.sessionId),
@@ -49,6 +67,13 @@ export function ChatWorkspace() {
             limit: 20,
             offset: 0,
         });
+
+    const sessionDetailQuery =
+        useChatSessionQuery(
+            courseId === null
+                ? null
+                : selectedSessionId,
+        );
 
     if (courseId === null) {
         return (
@@ -63,6 +88,10 @@ export function ChatWorkspace() {
             </Card>
         );
     }
+
+    const invalidSessionRoute =
+        hasSessionRouteParam &&
+        selectedSessionId === null;
 
     function handleNewChat() {
         navigate(`/courses/${courseId}/chat`);
@@ -90,7 +119,9 @@ export function ChatWorkspace() {
                     isLoading={
                         sessionsQuery.isPending
                     }
-                    isError={sessionsQuery.isError}
+                    isError={
+                        sessionsQuery.isError
+                    }
                     onRetry={() => {
                         void sessionsQuery.refetch();
                     }}
@@ -114,7 +145,9 @@ export function ChatWorkspace() {
                     isLoading={
                         sessionsQuery.isPending
                     }
-                    isError={sessionsQuery.isError}
+                    isError={
+                        sessionsQuery.isError
+                    }
                     onRetry={() => {
                         void sessionsQuery.refetch();
                     }}
@@ -127,58 +160,81 @@ export function ChatWorkspace() {
             </div>
 
             <Card className="min-h-[520px] overflow-hidden">
-                <header className="border-b border-line px-5 py-4 sm:px-6">
-                    <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-                        AI Chat
-                    </p>
-
-                    <h1 className="mt-1 text-xl font-semibold text-text-primary">
-                        Ask questions from your course
-                        materials
-                    </h1>
-
-                    <p className="mt-1 text-sm leading-6 text-text-secondary">
-                        Answers will be grounded in READY
-                        documents and connected to citations.
-                    </p>
-                </header>
-
-                <section className="flex min-h-[420px] items-center justify-center px-5 py-10 sm:px-6">
-                    {selectedSessionId ? (
-                        <div className="max-w-md text-center">
-                            <div className="mx-auto grid size-12 place-items-center rounded-full bg-brand-50 text-sm font-semibold text-brand-800">
-                                #{selectedSessionId}
-                            </div>
-
-                            <h2 className="mt-4 text-lg font-semibold text-text-primary">
-                                Chat session selected
-                            </h2>
+                {invalidSessionRoute ? (
+                    <div className="flex min-h-[520px] items-center justify-center px-5 py-10 text-center sm:px-6">
+                        <div className="max-w-md">
+                            <h1 className="text-lg font-semibold text-text-primary">
+                                Invalid chat session
+                            </h1>
 
                             <p className="mt-2 text-sm leading-6 text-text-secondary">
-                                M61.3 will load this
-                                session&apos;s historical messages
-                                and citations here.
+                                The session ID in this URL is not
+                                valid. Choose a previous chat or
+                                start a new one.
                             </p>
                         </div>
-                    ) : (
-                        <div className="max-w-md text-center">
-                            <div className="mx-auto grid size-12 place-items-center rounded-full bg-ai-50 text-sm font-semibold text-ai-700">
-                                AI
+                    </div>
+                ) : selectedSessionId ? (
+                    <ChatMessageList
+                        session={
+                            sessionDetailQuery.data ??
+                            null
+                        }
+                        selectedSessionId={
+                            selectedSessionId
+                        }
+                        isLoading={
+                            sessionDetailQuery.isPending
+                        }
+                        isError={
+                            sessionDetailQuery.isError
+                        }
+                        errorMessage={getErrorMessage(
+                            sessionDetailQuery.error,
+                        )}
+                        onRetry={() => {
+                            void sessionDetailQuery.refetch();
+                        }}
+                    />
+                ) : (
+                    <>
+                        <header className="border-b border-line px-5 py-4 sm:px-6">
+                            <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
+                                AI Chat
+                            </p>
+
+                            <h1 className="mt-1 text-xl font-semibold text-text-primary">
+                                Ask questions from your course
+                                materials
+                            </h1>
+
+                            <p className="mt-1 text-sm leading-6 text-text-secondary">
+                                Answers will be grounded in READY
+                                documents and connected to
+                                citations.
+                            </p>
+                        </header>
+
+                        <section className="flex min-h-[420px] items-center justify-center px-5 py-10 sm:px-6">
+                            <div className="max-w-md text-center">
+                                <div className="mx-auto grid size-12 place-items-center rounded-full bg-ai-50 text-sm font-semibold text-ai-700">
+                                    AI
+                                </div>
+
+                                <h2 className="mt-4 text-lg font-semibold text-text-primary">
+                                    Start a new course chat
+                                </h2>
+
+                                <p className="mt-2 text-sm leading-6 text-text-secondary">
+                                    M61.4 will add the question
+                                    composer here. For now,
+                                    choose a previous session or
+                                    keep this route for a new chat.
+                                </p>
                             </div>
-
-                            <h2 className="mt-4 text-lg font-semibold text-text-primary">
-                                Start a new course chat
-                            </h2>
-
-                            <p className="mt-2 text-sm leading-6 text-text-secondary">
-                                M61.4 will add the question
-                                composer here. For now, choose a
-                                previous session or keep this route
-                                for a new chat.
-                            </p>
-                        </div>
-                    )}
-                </section>
+                        </section>
+                    </>
+                )}
             </Card>
         </div>
     );
