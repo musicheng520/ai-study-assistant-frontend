@@ -59,4 +59,49 @@ export const queryKeys = {
                 "status",
             ] as const,
     },
+    chat: {
+        all: ["chat"] as const,
+
+        sessions: () =>
+            [...queryKeys.chat.all, "sessions"] as const,
+
+        sessionList: (
+            courseId: number,
+            params: {
+                limit: number;
+                offset: number;
+            },
+        ) =>
+            [
+                ...queryKeys.chat.sessions(),
+                {
+                    courseId,
+                    ...params,
+                },
+            ] as const,
+
+        sessionDetails: () =>
+            [...queryKeys.chat.all, "session-detail"] as const,
+
+        sessionDetail: (sessionId: number) =>
+            [
+                ...queryKeys.chat.sessionDetails(),
+                sessionId,
+            ] as const,
+
+        sourceChunks: () =>
+            [...queryKeys.chat.all, "source-chunks"] as const,
+
+        sourceChunk: (
+            courseId: number,
+            chunkId: number,
+        ) =>
+            [
+                ...queryKeys.chat.sourceChunks(),
+                {
+                    courseId,
+                    chunkId,
+                },
+            ] as const,
+    },
 } as const;
