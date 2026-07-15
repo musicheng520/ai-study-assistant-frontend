@@ -15,7 +15,7 @@ import { CoursesPage } from "@/features/courses/pages/CoursesPage";
 import { DocumentsPage } from "@/features/documents/pages/DocumentsPage";
 import { HomePage } from "@/features/home/pages/HomePage";
 import { OverallProgressPage } from "@/features/progress/pages/OverallProgressPage";
-
+import { ChatPage } from "@/features/chat";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -64,6 +64,24 @@ export const router = createBrowserRouter([
                                         handle:
                                             appRouteHandle(
                                                 "Documents",
+                                            ),
+                                    },
+                                    {
+                                        path: "chat",
+                                        element:
+                                            <ChatPage />,
+                                        handle:
+                                            appRouteHandle(
+                                                "AI Chat",
+                                            ),
+                                    },
+                                    {
+                                        path: "chat/:sessionId",
+                                        element:
+                                            <ChatPage />,
+                                        handle:
+                                            appRouteHandle(
+                                                "AI Chat",
                                             ),
                                     },
                                 ],

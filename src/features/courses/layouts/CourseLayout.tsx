@@ -3,6 +3,7 @@ import {
     Edit3,
     FileText,
     LayoutDashboard,
+    MessageSquare,
     Trash2,
 } from "lucide-react";
 import {
@@ -320,6 +321,31 @@ export function CourseLayout() {
                                 aria-hidden="true"
                             />
                             Documents
+                        </NavLink>
+
+                        <NavLink
+                            className={({ isActive }) =>
+                                cn(
+                                    [
+                                        "flex items-center gap-2",
+                                        "border-b-2 px-4 py-3",
+                                        "text-sm font-medium",
+                                        "transition-colors",
+                                        "focus-visible:outline-2",
+                                        "focus-visible:outline-brand-600",
+                                    ],
+                                    isActive
+                                        ? "border-brand-700 text-brand-800"
+                                        : "border-transparent text-text-secondary hover:text-text-primary",
+                                )
+                            }
+                            to={`/courses/${course.id}/chat`}
+                        >
+                            <MessageSquare
+                                className="size-4"
+                                aria-hidden="true"
+                            />
+                            AI Chat
                         </NavLink>
                     </div>
                 </nav>
