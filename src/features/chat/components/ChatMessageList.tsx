@@ -1,4 +1,8 @@
 import {
+    useEffect,
+    useRef,
+} from "react";
+import {
     AlertTriangle,
     Bot,
     FileText,
@@ -17,8 +21,10 @@ import type {
     ChatMessage,
     ChatSessionDetail,
 } from "../model";
+import { ChatMessageActions } from "./ChatMessageActions";
 
 type ChatMessageListProps = {
+    courseId: number;
     session: ChatSessionDetail | null;
     selectedSessionId: number;
     isLoading: boolean;
@@ -214,9 +220,11 @@ function CitationList({
 }
 
 function ChatMessageBubble({
+                               courseId,
                                message,
                                onOpenCitation,
                            }: {
+    courseId: number;
     message: ChatMessage;
     onOpenCitation: (
         citation: ChatCitation,
@@ -318,6 +326,13 @@ function ChatMessageBubble({
                         onOpenCitation
                     }
                 />
+
+                {!isUser ? (
+                    <ChatMessageActions
+                        courseId={courseId}
+                        message={message}
+                    />
+                ) : null}
             </div>
 
             {isUser ? (
@@ -333,6 +348,7 @@ function ChatMessageBubble({
 }
 
 export function ChatMessageList({
+                                    courseId,
                                     session,
                                     selectedSessionId,
                                     isLoading,
@@ -341,6 +357,31 @@ export function ChatMessageList({
                                     onRetry,
                                     onOpenCitation,
                                 }: ChatMessageListProps) {
+    const bottomRef =
+        useRef<HTMLDivElement | null>(null);
+
+    const messageCount =
+        session?.messages.length ?? 0;
+
+    useEffect(() => {
+        if (
+            isLoading ||
+            isError ||
+            messageCount === 0
+        ) {
+            return;
+        }
+
+        bottomRef.current?.scrollIntoView({
+            block: "end",
+        });
+    }, [
+        isError,
+        isLoading,
+        messageCount,
+        selectedSessionId,
+    ]);
+
     if (isLoading) {
         return (
             <div className="flex min-h-[520px] flex-col">
@@ -442,6 +483,7 @@ export function ChatMessageList({
                         (message) => (
                             <ChatMessageBubble
                                 key={message.id}
+                                courseId={courseId}
                                 message={message}
                                 onOpenCitation={
                                     onOpenCitation
@@ -449,6 +491,8 @@ export function ChatMessageList({
                             />
                         ),
                     )}
+
+                    <div ref={bottomRef} />
                 </div>
             )}
         </div>

@@ -271,6 +271,7 @@ export function ChatWorkspace() {
                             </div>
                         ) : selectedSessionId ? (
                             <ChatMessageList
+                                courseId={activeCourseId}
                                 session={
                                     sessionDetailQuery.data ??
                                     null

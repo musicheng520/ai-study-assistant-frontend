@@ -6,3 +6,4 @@ export * from "./components/ChatSessionList";
 export * from "./components/ChatMessageList";
 export * from "./components/ChatComposer";
 export * from "./components/CitationSourceViewer";
+export * from "./components/ChatMessageActions";
