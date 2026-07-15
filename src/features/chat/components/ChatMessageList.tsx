@@ -1,4 +1,5 @@
 import {
+    AlertTriangle,
     Bot,
     FileText,
     MessageSquare,
@@ -12,6 +13,7 @@ import {
 import { cn } from "@/lib/utils/cn";
 
 import type {
+    ChatCitation,
     ChatMessage,
     ChatSessionDetail,
 } from "../model";
@@ -23,6 +25,9 @@ type ChatMessageListProps = {
     isError: boolean;
     errorMessage?: string;
     onRetry: () => void;
+    onOpenCitation: (
+        citation: ChatCitation,
+    ) => void;
 };
 
 function formatMessageTime(value: string) {
@@ -99,10 +104,42 @@ function MessageEmptyState() {
     );
 }
 
+function NoAnswerPanel() {
+    return (
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <div className="flex items-start gap-3">
+                <AlertTriangle
+                    className="mt-0.5 size-5 shrink-0 text-amber-700"
+                    aria-hidden="true"
+                />
+
+                <div>
+                    <p className="text-sm font-semibold text-amber-900">
+                        The AI could not find enough evidence
+                    </p>
+
+                    <p className="mt-1 text-sm leading-6 text-amber-800">
+                        This is not a system failure. It means
+                        the available course documents did not
+                        provide strong enough support for a
+                        grounded answer. Try asking a narrower
+                        question, choosing a specific document,
+                        or uploading more relevant material.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function CitationList({
                           message,
+                          onOpenCitation,
                       }: {
     message: ChatMessage;
+    onOpenCitation: (
+        citation: ChatCitation,
+    ) => void;
 }) {
     if (
         message.role !== "ASSISTANT" ||
@@ -143,6 +180,12 @@ function CitationList({
                             title={
                                 citation.snippet
                             }
+                            aria-label={`Open citation ${citationNumber} from ${citation.fileName}`}
+                            onClick={() => {
+                                onOpenCitation(
+                                    citation,
+                                );
+                            }}
                         >
                             <FileText
                                 className="size-3.5 shrink-0"
@@ -172,8 +215,12 @@ function CitationList({
 
 function ChatMessageBubble({
                                message,
+                               onOpenCitation,
                            }: {
     message: ChatMessage;
+    onOpenCitation: (
+        citation: ChatCitation,
+    ) => void;
 }) {
     const isUser =
         message.role === "USER";
@@ -261,7 +308,16 @@ function ChatMessageBubble({
                     ) : null}
                 </div>
 
-                <CitationList message={message} />
+                {!isUser && message.noAnswer ? (
+                    <NoAnswerPanel />
+                ) : null}
+
+                <CitationList
+                    message={message}
+                    onOpenCitation={
+                        onOpenCitation
+                    }
+                />
             </div>
 
             {isUser ? (
@@ -283,6 +339,7 @@ export function ChatMessageList({
                                     isError,
                                     errorMessage,
                                     onRetry,
+                                    onOpenCitation,
                                 }: ChatMessageListProps) {
     if (isLoading) {
         return (
@@ -386,6 +443,9 @@ export function ChatMessageList({
                             <ChatMessageBubble
                                 key={message.id}
                                 message={message}
+                                onOpenCitation={
+                                    onOpenCitation
+                                }
                             />
                         ),
                     )}

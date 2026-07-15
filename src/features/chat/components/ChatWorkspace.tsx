@@ -15,9 +15,11 @@ import {
     useChatSessionQuery,
     useCourseChatSessionsQuery,
 } from "../api";
+import type { ChatCitation } from "../model";
 import { ChatComposer } from "./ChatComposer";
 import { ChatMessageList } from "./ChatMessageList";
 import { ChatSessionList } from "./ChatSessionList";
+import { CitationSourceViewer } from "./CitationSourceViewer";
 
 function parseRouteNumber(
     value: string | undefined,
@@ -57,6 +59,16 @@ export function ChatWorkspace() {
         askError,
         setAskError,
     ] = useState<string | null>(null);
+
+    const [
+        selectedCitation,
+        setSelectedCitation,
+    ] = useState<ChatCitation | null>(null);
+
+    const [
+        sourceViewerOpen,
+        setSourceViewerOpen,
+    ] = useState(false);
 
     const courseId = useMemo(
         () => parseRouteNumber(params.courseId),
@@ -164,161 +176,195 @@ export function ChatWorkspace() {
         }
     }
 
+    function handleOpenCitation(
+        citation: ChatCitation,
+    ) {
+        setSelectedCitation(citation);
+        setSourceViewerOpen(true);
+    }
+
+    function handleSourceViewerOpenChange(
+        nextOpen: boolean,
+    ) {
+        setSourceViewerOpen(nextOpen);
+
+        if (!nextOpen) {
+            setSelectedCitation(null);
+        }
+    }
+
     const composerDisabled =
         invalidSessionRoute ||
         sessionDetailQuery.isError;
 
     return (
-        <div className="grid gap-4 lg:grid-cols-[20rem_minmax(0,1fr)]">
-            <aside className="hidden lg:block">
-                <ChatSessionList
-                    sessions={
-                        sessionsQuery.data?.sessions ??
-                        []
-                    }
-                    selectedSessionId={
-                        selectedSessionId
-                    }
-                    isLoading={
-                        sessionsQuery.isPending
-                    }
-                    isError={
-                        sessionsQuery.isError
-                    }
-                    onRetry={() => {
-                        void sessionsQuery.refetch();
-                    }}
-                    onNewChat={handleNewChat}
-                    onSelectSession={
-                        handleSelectSession
-                    }
-                    variant="sidebar"
-                />
-            </aside>
+        <>
+            <div className="grid gap-4 lg:grid-cols-[20rem_minmax(0,1fr)]">
+                <aside className="hidden lg:block">
+                    <ChatSessionList
+                        sessions={
+                            sessionsQuery.data?.sessions ??
+                            []
+                        }
+                        selectedSessionId={
+                            selectedSessionId
+                        }
+                        isLoading={
+                            sessionsQuery.isPending
+                        }
+                        isError={
+                            sessionsQuery.isError
+                        }
+                        onRetry={() => {
+                            void sessionsQuery.refetch();
+                        }}
+                        onNewChat={handleNewChat}
+                        onSelectSession={
+                            handleSelectSession
+                        }
+                        variant="sidebar"
+                    />
+                </aside>
 
-            <div className="lg:hidden">
-                <ChatSessionList
-                    sessions={
-                        sessionsQuery.data?.sessions ??
-                        []
-                    }
-                    selectedSessionId={
-                        selectedSessionId
-                    }
-                    isLoading={
-                        sessionsQuery.isPending
-                    }
-                    isError={
-                        sessionsQuery.isError
-                    }
-                    onRetry={() => {
-                        void sessionsQuery.refetch();
-                    }}
-                    onNewChat={handleNewChat}
-                    onSelectSession={
-                        handleSelectSession
-                    }
-                    variant="compact"
-                />
-            </div>
-
-            <Card className="flex min-h-[620px] flex-col overflow-hidden">
-                <div className="min-h-0 flex-1">
-                    {invalidSessionRoute ? (
-                        <div className="flex min-h-[520px] items-center justify-center px-5 py-10 text-center sm:px-6">
-                            <div className="max-w-md">
-                                <h1 className="text-lg font-semibold text-text-primary">
-                                    Invalid chat session
-                                </h1>
-
-                                <p className="mt-2 text-sm leading-6 text-text-secondary">
-                                    The session ID in this URL is
-                                    not valid. Choose a previous
-                                    chat or start a new one.
-                                </p>
-                            </div>
-                        </div>
-                    ) : selectedSessionId ? (
-                        <ChatMessageList
-                            session={
-                                sessionDetailQuery.data ??
-                                null
-                            }
-                            selectedSessionId={
-                                selectedSessionId
-                            }
-                            isLoading={
-                                sessionDetailQuery.isPending
-                            }
-                            isError={
-                                sessionDetailQuery.isError
-                            }
-                            errorMessage={getErrorMessage(
-                                sessionDetailQuery.error,
-                            )}
-                            onRetry={() => {
-                                void sessionDetailQuery.refetch();
-                            }}
-                        />
-                    ) : (
-                        <>
-                            <header className="border-b border-line px-5 py-4 sm:px-6">
-                                <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-                                    AI Chat
-                                </p>
-
-                                <h1 className="mt-1 text-xl font-semibold text-text-primary">
-                                    Ask questions from your course
-                                    materials
-                                </h1>
-
-                                <p className="mt-1 text-sm leading-6 text-text-secondary">
-                                    Answers will be grounded in
-                                    READY documents and connected
-                                    to citations.
-                                </p>
-                            </header>
-
-                            <section className="flex min-h-[420px] items-center justify-center px-5 py-10 sm:px-6">
-                                <div className="max-w-md text-center">
-                                    <div className="mx-auto grid size-12 place-items-center rounded-full bg-ai-50 text-sm font-semibold text-ai-700">
-                                        AI
-                                    </div>
-
-                                    <h2 className="mt-4 text-lg font-semibold text-text-primary">
-                                        Start a new course chat
-                                    </h2>
-
-                                    <p className="mt-2 text-sm leading-6 text-text-secondary">
-                                        Ask a question below to
-                                        create a new chat session
-                                        for this course.
-                                    </p>
-                                </div>
-                            </section>
-                        </>
-                    )}
+                <div className="lg:hidden">
+                    <ChatSessionList
+                        sessions={
+                            sessionsQuery.data?.sessions ??
+                            []
+                        }
+                        selectedSessionId={
+                            selectedSessionId
+                        }
+                        isLoading={
+                            sessionsQuery.isPending
+                        }
+                        isError={
+                            sessionsQuery.isError
+                        }
+                        onRetry={() => {
+                            void sessionsQuery.refetch();
+                        }}
+                        onNewChat={handleNewChat}
+                        onSelectSession={
+                            handleSelectSession
+                        }
+                        variant="compact"
+                    />
                 </div>
 
-                {askError ? (
-                    <div className="border-t border-red-200 bg-red-50 px-5 py-3 text-sm text-red-800 sm:px-6">
-                        {askError}
-                    </div>
-                ) : null}
+                <Card className="flex min-h-[620px] flex-col overflow-hidden">
+                    <div className="min-h-0 flex-1">
+                        {invalidSessionRoute ? (
+                            <div className="flex min-h-[520px] items-center justify-center px-5 py-10 text-center sm:px-6">
+                                <div className="max-w-md">
+                                    <h1 className="text-lg font-semibold text-text-primary">
+                                        Invalid chat session
+                                    </h1>
 
-                <ChatComposer
-                    disabled={composerDisabled}
-                    isSubmitting={
-                        askMutation.isPending
-                    }
-                    submitLabel={
-                        selectedSessionId
-                            ? "Send"
-                            : "Start chat"
-                    }
-                    onSubmit={handleAskQuestion}
-                />
-            </Card>
-        </div>
+                                    <p className="mt-2 text-sm leading-6 text-text-secondary">
+                                        The session ID in this URL
+                                        is not valid. Choose a
+                                        previous chat or start a
+                                        new one.
+                                    </p>
+                                </div>
+                            </div>
+                        ) : selectedSessionId ? (
+                            <ChatMessageList
+                                session={
+                                    sessionDetailQuery.data ??
+                                    null
+                                }
+                                selectedSessionId={
+                                    selectedSessionId
+                                }
+                                isLoading={
+                                    sessionDetailQuery.isPending
+                                }
+                                isError={
+                                    sessionDetailQuery.isError
+                                }
+                                errorMessage={getErrorMessage(
+                                    sessionDetailQuery.error,
+                                )}
+                                onRetry={() => {
+                                    void sessionDetailQuery.refetch();
+                                }}
+                                onOpenCitation={
+                                    handleOpenCitation
+                                }
+                            />
+                        ) : (
+                            <>
+                                <header className="border-b border-line px-5 py-4 sm:px-6">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
+                                        AI Chat
+                                    </p>
+
+                                    <h1 className="mt-1 text-xl font-semibold text-text-primary">
+                                        Ask questions from your
+                                        course materials
+                                    </h1>
+
+                                    <p className="mt-1 text-sm leading-6 text-text-secondary">
+                                        Answers will be grounded in
+                                        READY documents and
+                                        connected to citations.
+                                    </p>
+                                </header>
+
+                                <section className="flex min-h-[420px] items-center justify-center px-5 py-10 sm:px-6">
+                                    <div className="max-w-md text-center">
+                                        <div className="mx-auto grid size-12 place-items-center rounded-full bg-ai-50 text-sm font-semibold text-ai-700">
+                                            AI
+                                        </div>
+
+                                        <h2 className="mt-4 text-lg font-semibold text-text-primary">
+                                            Start a new course chat
+                                        </h2>
+
+                                        <p className="mt-2 text-sm leading-6 text-text-secondary">
+                                            Ask a question below to
+                                            create a new chat
+                                            session for this course.
+                                        </p>
+                                    </div>
+                                </section>
+                            </>
+                        )}
+                    </div>
+
+                    {askError ? (
+                        <div className="border-t border-red-200 bg-red-50 px-5 py-3 text-sm text-red-800 sm:px-6">
+                            {askError}
+                        </div>
+                    ) : null}
+
+                    <ChatComposer
+                        disabled={composerDisabled}
+                        isSubmitting={
+                            askMutation.isPending
+                        }
+                        submitLabel={
+                            selectedSessionId
+                                ? "Send"
+                                : "Start chat"
+                        }
+                        onSubmit={
+                            handleAskQuestion
+                        }
+                    />
+                </Card>
+            </div>
+
+            <CitationSourceViewer
+                open={sourceViewerOpen}
+                courseId={activeCourseId}
+                citation={selectedCitation}
+                onOpenChange={
+                    handleSourceViewerOpenChange
+                }
+            />
+        </>
     );
 }
