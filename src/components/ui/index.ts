@@ -19,4 +19,5 @@ export {
 } from "./card";
 
 export { Skeleton } from "./skeleton";
-export {Input} from "./input"
+export {Input} from "./input";
+export { Dialog } from "./dialog";

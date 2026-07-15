@@ -8,10 +8,14 @@ import { appRouteHandle } from "@/app/router/routeHandle";
 import { AccountPage } from "@/features/account/pages/AccountPage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
+import { ProtectedRoute } from "@/features/auth/routing/ProtectedRoute";
+import { CourseLayout } from "@/features/courses/layouts/CourseLayout";
+import { CourseOverviewPage } from "@/features/courses/pages/CourseOverviewPage";
 import { CoursesPage } from "@/features/courses/pages/CoursesPage";
+import { DocumentsPlaceholderPage } from "@/features/courses/pages/DocumentsPlaceholderPage";
 import { HomePage } from "@/features/home/pages/HomePage";
 import { OverallProgressPage } from "@/features/progress/pages/OverallProgressPage";
-import { ProtectedRoute } from "@/features/auth/routing/ProtectedRoute";
+
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -37,6 +41,34 @@ export const router = createBrowserRouter([
                                     appRouteHandle("Courses"),
                             },
                             {
+                                path: "courses/:courseId",
+                                element: <CourseLayout />,
+                                handle:
+                                    appRouteHandle(
+                                        "Course workspace",
+                                    ),
+                                children: [
+                                    {
+                                        index: true,
+                                        element:
+                                            <CourseOverviewPage />,
+                                        handle:
+                                            appRouteHandle(
+                                                "Course overview",
+                                            ),
+                                    },
+                                    {
+                                        path: "documents",
+                                        element:
+                                            <DocumentsPlaceholderPage />,
+                                        handle:
+                                            appRouteHandle(
+                                                "Documents",
+                                            ),
+                                    },
+                                ],
+                            },
+                            {
                                 path: "progress",
                                 element:
                                     <OverallProgressPage />,
@@ -49,7 +81,9 @@ export const router = createBrowserRouter([
                                 path: "account",
                                 element: <AccountPage />,
                                 handle:
-                                    appRouteHandle("Account"),
+                                    appRouteHandle(
+                                        "Account",
+                                    ),
                             },
                         ],
                     },
