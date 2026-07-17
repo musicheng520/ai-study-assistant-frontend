@@ -3,6 +3,7 @@ import {
     ChartNoAxesCombined,
     House,
     LibraryBig,
+    ServerCog,
     UserRound,
 } from "lucide-react";
 
@@ -33,6 +34,12 @@ export const primaryNavigationItems: AppNavigationItem[] = [
         description: "Review your learning progress",
         to: "/progress",
         icon: ChartNoAxesCombined,
+    },
+    {
+        label: "Admin",
+        description: "Monitor AI and workflow logs",
+        to: "/admin",
+        icon: ServerCog,
     },
 ];
 
