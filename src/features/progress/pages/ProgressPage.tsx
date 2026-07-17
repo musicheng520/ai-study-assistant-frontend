@@ -6,11 +6,9 @@ import {
     Brain,
     FileText,
     Flame,
-    HelpCircle,
     Layers,
     MessageSquareText,
     RefreshCw,
-    Sparkles,
     Trophy,
 } from "lucide-react";
 import { Link } from "react-router";

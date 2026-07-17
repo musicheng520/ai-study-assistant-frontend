@@ -19,6 +19,7 @@ import { StudyHubPage } from "@/features/study";
 import {QuizRunnerPage} from "@/features/quizzes";
 import { FlashcardStudyPage } from "@/features/flashcards";
 import { ProgressPage } from "@/features/progress";
+import {AdminMetricsPage} from "@/features/admin";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -123,6 +124,15 @@ export const router = createBrowserRouter([
                                 handle:
                                     appRouteHandle(
                                         "Progress",
+                                    ),
+                            },
+                            {
+                                path: "admin",
+                                element:
+                                    <AdminMetricsPage />,
+                                handle:
+                                    appRouteHandle(
+                                        "Admin",
                                     ),
                             },
                             {

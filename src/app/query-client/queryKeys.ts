@@ -321,4 +321,51 @@ export const queryKeys = {
                 "activity",
             ] as const,
     },
+    admin: {
+        all: ["admin"] as const,
+
+        metrics: () =>
+            [...queryKeys.admin.all, "metrics"] as const,
+
+        aiMetrics: (days: number) =>
+            [
+                ...queryKeys.admin.metrics(),
+                "ai",
+                { days },
+            ] as const,
+
+        cacheMetrics: (days: number) =>
+            [
+                ...queryKeys.admin.metrics(),
+                "cache",
+                { days },
+            ] as const,
+
+        logs: () =>
+            [...queryKeys.admin.all, "logs"] as const,
+
+        aiRequestLogs: (filters: {
+            workflowType?: string;
+            onlyFailures?: boolean;
+            limit?: number;
+            offset?: number;
+        }) =>
+            [
+                ...queryKeys.admin.logs(),
+                "ai-requests",
+                filters,
+            ] as const,
+
+        workflowLogs: (filters: {
+            status?: string;
+            workflowType?: string;
+            limit?: number;
+            offset?: number;
+        }) =>
+            [
+                ...queryKeys.admin.logs(),
+                "workflows",
+                filters,
+            ] as const,
+    },
 } as const;
