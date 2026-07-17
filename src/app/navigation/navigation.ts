@@ -13,6 +13,7 @@ export type AppNavigationItem = {
     to: string;
     icon: LucideIcon;
     end?: boolean;
+    requiresAdmin?: boolean;
 };
 
 export const primaryNavigationItems: AppNavigationItem[] = [
@@ -40,6 +41,7 @@ export const primaryNavigationItems: AppNavigationItem[] = [
         description: "Monitor AI and workflow logs",
         to: "/admin",
         icon: ServerCog,
+        requiresAdmin: true,
     },
 ];
 

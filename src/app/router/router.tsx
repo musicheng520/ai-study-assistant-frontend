@@ -22,6 +22,7 @@ import { ProgressPage } from "@/features/progress";
 import {
     AdminMetricsPage,
     AdminRequestLogsPage,
+    AdminRouteGuard,
     AdminWorkflowLogsPage,
 } from "@/features/admin";
 export const router = createBrowserRouter([
@@ -133,7 +134,9 @@ export const router = createBrowserRouter([
                             {
                                 path: "admin",
                                 element:
-                                    <AdminMetricsPage />,
+                                    <AdminRouteGuard>
+                                        <AdminMetricsPage />
+                                    </AdminRouteGuard>,
                                 handle:
                                     appRouteHandle(
                                         "Admin",
@@ -142,7 +145,9 @@ export const router = createBrowserRouter([
                             {
                                 path: "admin/requests",
                                 element:
-                                    <AdminRequestLogsPage />,
+                                    <AdminRouteGuard>
+                                        <AdminRequestLogsPage />
+                                    </AdminRouteGuard>,
                                 handle:
                                     appRouteHandle(
                                         "AI Request Logs",
@@ -151,7 +156,9 @@ export const router = createBrowserRouter([
                             {
                                 path: "admin/workflows",
                                 element:
-                                    <AdminWorkflowLogsPage />,
+                                    <AdminRouteGuard>
+                                        <AdminWorkflowLogsPage />
+                                    </AdminRouteGuard>,
                                 handle:
                                     appRouteHandle(
                                         "Workflow Logs",

@@ -21,3 +21,5 @@ export {
     getUserInitials,
     getUserRoleLabel,
 } from "./userPresentation";
+
+export * from "./auth-permissions";

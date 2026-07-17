@@ -7,6 +7,8 @@ import {
     NavLink,
     useLocation,
 } from "react-router";
+import { useAuth } from "@/features/auth/context";
+import { isAdminUser } from "@/features/auth/model";
 
 import {
     primaryNavigationItems,
@@ -19,7 +21,18 @@ export function MobileBottomNavigation() {
     const [isMoreOpen, setIsMoreOpen] =
         useState(false);
 
+    const { user } = useAuth();
+
     const location = useLocation();
+
+    const visiblePrimaryNavigationItems =
+        primaryNavigationItems.filter((item) => {
+            if (!item.requiresAdmin) {
+                return true;
+            }
+
+            return isAdminUser(user);
+        });
 
     const closeMoreMenu = useCallback(() => {
         setIsMoreOpen(false);
@@ -45,14 +58,21 @@ export function MobileBottomNavigation() {
                 className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur lg:hidden"
                 aria-label="Mobile navigation"
             >
-                <div className="grid h-16 grid-cols-4 px-2">
+                <div
+                    className={cn(
+                        "grid h-16 px-2",
+                        visiblePrimaryNavigationItems.length >= 4
+                            ? "grid-cols-5"
+                            : "grid-cols-4",
+                    )}
+                >
                     {primaryNavigationItems.map((item) => {
                         const Icon = item.icon;
 
                         return (
                             <NavLink
                                 key={item.to}
-                                className={({ isActive }) =>
+                                className={({isActive}) =>
                                     cn(
                                         [
                                             "relative flex min-w-0",
@@ -73,7 +93,7 @@ export function MobileBottomNavigation() {
                                 end={item.end}
                                 to={item.to}
                             >
-                                {({ isActive }) => (
+                                {({isActive}) => (
                                     <>
                     <span
                         className={cn(
@@ -87,7 +107,7 @@ export function MobileBottomNavigation() {
                         )}
                         aria-hidden="true"
                     >
-                      <Icon className="size-5" />
+                      <Icon className="size-5"/>
                     </span>
 
                                         <span className="max-w-full truncate">
@@ -135,7 +155,7 @@ export function MobileBottomNavigation() {
                 )}
                 aria-hidden="true"
             >
-              <Ellipsis className="size-5" />
+              <Ellipsis className="size-5"/>
             </span>
 
                         <span>More</span>

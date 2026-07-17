@@ -7,7 +7,21 @@ import { NavLink } from "react-router";
 import { primaryNavigationItems } from "@/app/navigation/navigation";
 import { cn } from "@/lib/utils/cn";
 
+import { useAuth } from "@/features/auth/context";
+import { isAdminUser } from "@/features/auth/model";
+
 export function DesktopSidebar() {
+    const { user } = useAuth();
+
+    const visiblePrimaryNavigationItems =
+        primaryNavigationItems.filter((item) => {
+            if (!item.requiresAdmin) {
+                return true;
+            }
+
+            return isAdminUser(user);
+        });
+
     return (
         <aside className="hidden border-r border-line bg-surface lg:block">
             <div className="sticky top-0 flex h-screen flex-col">
@@ -45,7 +59,7 @@ export function DesktopSidebar() {
                     </p>
 
                     <ul className="mt-3 space-y-1">
-                        {primaryNavigationItems.map((item) => {
+                        {visiblePrimaryNavigationItems.map((item) => {
                             const Icon = item.icon;
 
                             return (
