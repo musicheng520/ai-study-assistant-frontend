@@ -14,7 +14,7 @@ import {
     Trophy,
 } from "lucide-react";
 import { Link } from "react-router";
-
+import { CourseProgressDrilldown } from "@/features/progress/components/CourseProgressDrilldown";
 import {
     EmptyState,
     ErrorState,
@@ -555,28 +555,28 @@ export function ProgressPage() {
                     </Card>
                 </div>
 
+                <CourseProgressDrilldown courses={courses} />
+
                 <Card className="p-5 sm:p-6">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <p className="text-xs font-medium uppercase tracking-wide text-text-muted">
-                                Next step
+                                M64 complete
                             </p>
 
                             <h2 className="mt-2 text-lg font-semibold text-text-primary">
-                                Course-level analytics coming next
+                                Progress dashboard is connected
                             </h2>
 
                             <p className="mt-2 max-w-3xl text-sm leading-6 text-text-secondary">
-                                The next half of M64 will add
-                                course-specific progress,
-                                weak-topic breakdowns,
-                                recommendations and wrong-answer
-                                management.
+                                This page now combines global progress, course
+                                progress, weak-topic analytics, recommendations
+                                and recent learning activity.
                             </p>
                         </div>
 
-                        <Badge variant="warning">
-                            M64.2 complete
+                        <Badge variant="success">
+                            Ready
                         </Badge>
                     </div>
                 </Card>
