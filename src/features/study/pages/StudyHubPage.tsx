@@ -25,6 +25,7 @@ type StudyFeatureCard = {
     badge: string;
     status: "active";
     icon: typeof FileText;
+    href: string;
 };
 
 const studyFeatures: StudyFeatureCard[] = [
@@ -35,6 +36,7 @@ const studyFeatures: StudyFeatureCard[] = [
         badge: "M62",
         status: "active",
         icon: FileText,
+        href: "#summary-generator",
     },
     {
         title: "Quiz",
@@ -43,6 +45,7 @@ const studyFeatures: StudyFeatureCard[] = [
         badge: "M63",
         status: "active",
         icon: ListChecks,
+        href: "#quiz-generator",
     },
     {
         title: "Flashcards",
@@ -51,6 +54,7 @@ const studyFeatures: StudyFeatureCard[] = [
         badge: "M63.3",
         status: "active",
         icon: Layers,
+        href: "#flashcard-generator",
     },
 ];
 
@@ -97,9 +101,14 @@ export function StudyHubPage() {
                         const Icon = feature.icon;
 
                         return (
-                            <div
+                            <a
                                 key={feature.title}
-                                className="rounded-2xl border border-line bg-surface p-4"
+                                href={feature.href}
+                                className={[
+                                    "rounded-2xl border border-line bg-surface p-4",
+                                    "transition-colors hover:border-brand-200 hover:bg-brand-50/40",
+                                    "focus-visible:outline-2 focus-visible:outline-brand-600",
+                                ].join(" ")}
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="grid size-10 place-items-center rounded-xl bg-ai-50 text-ai-700">
@@ -128,30 +137,47 @@ export function StudyHubPage() {
                                         variant="secondary"
                                         disabled
                                     >
-                                        Active below
+                                        Jump below
                                     </Button>
                                 </div>
-                            </div>
+                            </a>
                         );
                     })}
                 </div>
             </Card>
 
-            <SummaryGeneratorPanel
-                courseId={course.id}
-            />
+            <section
+                id="summary-generator"
+                className="scroll-mt-24"
+            >
+                <SummaryGeneratorPanel
+                    courseId={course.id}
+                />
+            </section>
 
             <SavedSummariesPanel
                 courseId={course.id}
             />
 
-            <QuizGeneratorPanel courseId={course.id} />
+            <section
+                id="quiz-generator"
+                className="scroll-mt-24"
+            >
+                <QuizGeneratorPanel
+                    courseId={course.id}
+                />
+            </section>
 
             <SavedQuizzesPanel courseId={course.id} />
 
-            <FlashcardGeneratorPanel
-                courseId={course.id}
-            />
+            <section
+                id="flashcard-generator"
+                className="scroll-mt-24"
+            >
+                <FlashcardGeneratorPanel
+                    courseId={course.id}
+                />
+            </section>
 
             <SavedFlashcardsPanel
                 courseId={course.id}

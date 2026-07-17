@@ -5,9 +5,7 @@ import {
     RefreshCcw,
     Trash2,
 } from "lucide-react";
-import {
-    Link,
-} from "react-router";
+import { Link } from "react-router";
 
 import {
     Badge,
@@ -16,6 +14,8 @@ import {
     buttonVariants,
 } from "@/components/ui";
 import {
+    getFlashcardSourceLabel,
+    isWeakTopicFlashcardSource,
     useCourseFlashcardsQuery,
     useDeleteFlashcardMutation,
 } from "@/features/flashcards";
@@ -39,16 +39,6 @@ function formatDate(value: string) {
     }).format(date);
 }
 
-function isWeakTopicSource(sourceType: string) {
-    return (
-        sourceType === "WEAK_TOPIC" ||
-        sourceType === "WEAK_TOPICS" ||
-        sourceType === "WRONG_TOPIC" ||
-        sourceType === "WRONG_TOPICS" ||
-        sourceType === "QUIZ_WRONG_TOPIC"
-    );
-}
-
 export function SavedFlashcardsPanel({
                                          courseId,
                                      }: SavedFlashcardsPanelProps) {
@@ -58,13 +48,11 @@ export function SavedFlashcardsPanel({
     const deleteMutation =
         useDeleteFlashcardMutation();
 
-    const cards =
-        flashcardsQuery.data ?? [];
+    const cards = flashcardsQuery.data ?? [];
 
-    const weakTopicCount =
-        cards.filter((card) =>
-            isWeakTopicSource(card.sourceType),
-        ).length;
+    const weakTopicCount = cards.filter((card) =>
+        isWeakTopicFlashcardSource(card.sourceType),
+    ).length;
 
     async function handleDelete(
         flashcardId: number,
@@ -83,7 +71,10 @@ export function SavedFlashcardsPanel({
     }
 
     return (
-        <Card className="overflow-hidden">
+        <Card
+            id="flashcards-library"
+            className="scroll-mt-24 overflow-hidden"
+        >
             <div className="flex flex-wrap items-start justify-between gap-4 border-b border-line px-5 py-5 sm:px-6">
                 <div>
                     <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-text-muted">
@@ -100,8 +91,9 @@ export function SavedFlashcardsPanel({
 
                     <p className="mt-2 text-sm leading-6 text-text-secondary">
                         Start all-card review or weak-topic
-                        review. Review intervals are stored
-                        locally for now.
+                        review. Review intervals are currently
+                        stored in browser localStorage until the
+                        backend review endpoint is added.
                     </p>
                 </div>
 
@@ -225,14 +217,16 @@ export function SavedFlashcardsPanel({
                                 <div className="flex flex-wrap items-center gap-2">
                                     <Badge
                                         variant={
-                                            isWeakTopicSource(
+                                            isWeakTopicFlashcardSource(
                                                 card.sourceType,
                                             )
                                                 ? "warning"
                                                 : "info"
                                         }
                                     >
-                                        {card.sourceType}
+                                        {getFlashcardSourceLabel(
+                                            card.sourceType,
+                                        )}
                                     </Badge>
 
                                     <Badge variant="neutral">

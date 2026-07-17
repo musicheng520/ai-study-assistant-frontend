@@ -13,25 +13,16 @@ import {
     buttonVariants,
 } from "@/components/ui";
 import { useCourseContext } from "@/features/courses/context/course-context";
-import { useCourseFlashcardsQuery } from "@/features/flashcards/api";
+import {
+    isWeakTopicFlashcardSource,
+    useCourseFlashcardsQuery,
+} from "@/features/flashcards";
 
 import { FlashcardStudySession } from "../components/FlashcardStudySession";
 
-function isWeakTopicSource(sourceType: string) {
-    return (
-        sourceType === "WEAK_TOPIC" ||
-        sourceType === "WEAK_TOPICS" ||
-        sourceType === "WRONG_TOPIC" ||
-        sourceType === "WRONG_TOPICS" ||
-        sourceType === "QUIZ_WRONG_TOPIC"
-    );
-}
-
 export function FlashcardStudyPage() {
     const { course } = useCourseContext();
-    const [
-        searchParams,
-    ] = useSearchParams();
+    const [searchParams] = useSearchParams();
 
     const mode =
         searchParams.get("mode") === "weak"
@@ -47,7 +38,9 @@ export function FlashcardStudyPage() {
     const cards =
         mode === "weak"
             ? allCards.filter((card) =>
-                isWeakTopicSource(card.sourceType),
+                isWeakTopicFlashcardSource(
+                    card.sourceType,
+                ),
             )
             : allCards;
 
@@ -93,7 +86,7 @@ export function FlashcardStudyPage() {
     return (
         <div className="space-y-4">
             <Link
-                to={`/courses/${course.id}/study`}
+                to={`/courses/${course.id}/study#flashcards-library`}
                 className={buttonVariants({
                     variant: "ghost",
                     size: "sm",
