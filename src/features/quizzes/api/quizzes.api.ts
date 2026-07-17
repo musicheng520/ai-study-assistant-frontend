@@ -1,18 +1,25 @@
 import { apiClient } from "@/lib/api/apiClient";
 
 import {
+    quizAttemptListSchema,
     quizDeleteResponseSchema,
+    quizDetailSchema,
     quizGenerateResponseSchema,
     quizSaveResponseSchema,
+    quizSubmitResponseSchema,
     savedQuizListSchema,
 } from "../model";
 import type {
+    QuizAttempt,
     QuizDeleteResponse,
+    QuizDetail,
     QuizGenerateRequest,
     QuizGenerateResponse,
     QuizSaveDraftRequest,
     QuizSaveResponse,
+    QuizSubmitResponse,
     SavedQuiz,
+    SubmitQuizRequest,
 } from "../model";
 
 const AI_GENERATION_TIMEOUT_MS = 120_000;
@@ -95,6 +102,62 @@ export async function getCourseQuizzes({
     );
 
     return savedQuizListSchema.parse(
+        response.data,
+    );
+}
+
+export type GetQuizDetailParams = {
+    quizId: number;
+    signal?: AbortSignal;
+};
+
+export async function getQuizDetail({
+                                        quizId,
+                                        signal,
+                                    }: GetQuizDetailParams): Promise<QuizDetail> {
+    const response = await apiClient.get<unknown>(
+        `/api/quizzes/${quizId}`,
+        { signal },
+    );
+
+    return quizDetailSchema.parse(response.data);
+}
+
+export type SubmitQuizParams = {
+    courseId: number;
+    quizId: number;
+    request: SubmitQuizRequest;
+};
+
+export async function submitQuiz({
+                                     quizId,
+                                     request,
+                                 }: SubmitQuizParams): Promise<QuizSubmitResponse> {
+    const response = await apiClient.post<unknown>(
+        `/api/quiz/${quizId}/submit`,
+        request,
+    );
+
+    return quizSubmitResponseSchema.parse(
+        response.data,
+    );
+}
+
+export type GetQuizAttemptsParams = {
+    quizId: number;
+    signal?: AbortSignal;
+};
+
+export async function getQuizAttempts({
+                                          quizId,
+                                          signal,
+                                      }: GetQuizAttemptsParams): Promise<QuizAttempt[]> {
+    const response = await apiClient.get<unknown>(
+        `/api/quiz/${quizId}/attempts`,
+        { signal },
+    );
+
+    return quizAttemptListSchema.parse(
         response.data,
     );
 }

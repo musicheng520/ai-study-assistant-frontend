@@ -1,13 +1,18 @@
 import {
     Calendar,
     ListChecks,
+    PlayCircle,
     RefreshCcw,
 } from "lucide-react";
+import {
+    Link,
+} from "react-router";
 
 import {
     Badge,
     Button,
     Card,
+    buttonVariants,
 } from "@/components/ui";
 import { useCourseQuizzesQuery } from "@/features/quizzes";
 
@@ -53,8 +58,8 @@ export function SavedQuizzesPanel({
                     </h2>
 
                     <p className="mt-2 text-sm leading-6 text-text-secondary">
-                        Saved quizzes are persisted and can be
-                        used later by the Quiz Runner module.
+                        Open a saved quiz, answer questions, and
+                        submit it for backend grading.
                     </p>
                 </div>
 
@@ -171,6 +176,23 @@ export function SavedQuizzesPanel({
                                             quiz.createdAt,
                                         )}
                                     </p>
+
+                                    <div className="mt-4">
+                                        <Link
+                                            to={`/courses/${courseId}/quizzes/${quiz.id}`}
+                                            className={buttonVariants({
+                                                variant:
+                                                    "secondary",
+                                                size: "sm",
+                                            })}
+                                        >
+                                            <PlayCircle
+                                                className="size-4"
+                                                aria-hidden="true"
+                                            />
+                                            Start quiz
+                                        </Link>
+                                    </div>
                                 </article>
                             ),
                         )}

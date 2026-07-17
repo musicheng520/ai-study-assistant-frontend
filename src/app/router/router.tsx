@@ -17,6 +17,8 @@ import { HomePage } from "@/features/home/pages/HomePage";
 import { OverallProgressPage } from "@/features/progress/pages/OverallProgressPage";
 import { ChatPage } from "@/features/chat";
 import { StudyHubPage } from "@/features/study";
+import {QuizRunnerPage} from "@/features/quizzes";
+
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -92,6 +94,15 @@ export const router = createBrowserRouter([
                                         handle:
                                             appRouteHandle(
                                                 "Study",
+                                            ),
+                                    },
+                                    {
+                                        path: "quizzes/:quizId",
+                                        element:
+                                            <QuizRunnerPage />,
+                                        handle:
+                                            appRouteHandle(
+                                                "Quiz Runner",
                                             ),
                                     },
                                 ],

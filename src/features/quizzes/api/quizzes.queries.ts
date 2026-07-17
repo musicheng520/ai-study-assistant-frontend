@@ -11,10 +11,14 @@ import {
     generateCourseQuiz,
     generateDocumentQuiz,
     getCourseQuizzes,
+    getQuizAttempts,
+    getQuizDetail,
     saveQuizDraft,
+    submitQuiz,
     type DeleteQuizParams,
     type GenerateCourseQuizParams,
     type GenerateDocumentQuizParams,
+    type SubmitQuizParams,
 } from "./quizzes.api";
 import type {
     QuizSaveDraftRequest,
@@ -36,6 +40,44 @@ export function useCourseQuizzesQuery(
             typeof courseId === "number" &&
             Number.isInteger(courseId) &&
             courseId > 0,
+    });
+}
+
+export function useQuizDetailQuery(
+    quizId: number | null,
+) {
+    return useQuery({
+        queryKey: queryKeys.quizzes.detail(
+            quizId ?? 0,
+        ),
+        queryFn: ({ signal }) =>
+            getQuizDetail({
+                quizId: quizId as number,
+                signal,
+            }),
+        enabled:
+            typeof quizId === "number" &&
+            Number.isInteger(quizId) &&
+            quizId > 0,
+    });
+}
+
+export function useQuizAttemptsQuery(
+    quizId: number | null,
+) {
+    return useQuery({
+        queryKey: queryKeys.quizzes.attempts(
+            quizId ?? 0,
+        ),
+        queryFn: ({ signal }) =>
+            getQuizAttempts({
+                quizId: quizId as number,
+                signal,
+            }),
+        enabled:
+            typeof quizId === "number" &&
+            Number.isInteger(quizId) &&
+            quizId > 0,
     });
 }
 
@@ -78,6 +120,39 @@ export function useSaveQuizDraftMutation() {
             await queryClient.invalidateQueries({
                 queryKey:
                 queryKeys.courses.all,
+            });
+        },
+    });
+}
+
+export function useSubmitQuizMutation() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (
+            params: SubmitQuizParams,
+        ) => submitQuiz(params),
+
+        onSuccess: async (data, variables) => {
+            await queryClient.invalidateQueries({
+                queryKey:
+                    queryKeys.quizzes.detail(
+                        data.quizId,
+                    ),
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey:
+                    queryKeys.quizzes.attempts(
+                        data.quizId,
+                    ),
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey:
+                    queryKeys.courses.overview(
+                        variables.courseId,
+                    ),
             });
         },
     });

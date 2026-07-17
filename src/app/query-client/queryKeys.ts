@@ -172,6 +172,12 @@ export const queryKeys = {
                 quizId,
             ] as const,
 
+        attempts: (quizId: number) =>
+            [
+                ...queryKeys.quizzes.detail(quizId),
+                "attempts",
+            ] as const,
+
         drafts: () =>
             [...queryKeys.quizzes.all, "draft"] as const,
 
