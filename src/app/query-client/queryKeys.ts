@@ -151,4 +151,66 @@ export const queryKeys = {
                 },
             ] as const,
     },
+    quizzes: {
+        all: ["quizzes"] as const,
+
+        lists: () =>
+            [...queryKeys.quizzes.all, "list"] as const,
+
+        list: (courseId: number) =>
+            [
+                ...queryKeys.quizzes.lists(),
+                { courseId },
+            ] as const,
+
+        details: () =>
+            [...queryKeys.quizzes.all, "detail"] as const,
+
+        detail: (quizId: number) =>
+            [
+                ...queryKeys.quizzes.details(),
+                quizId,
+            ] as const,
+
+        drafts: () =>
+            [...queryKeys.quizzes.all, "draft"] as const,
+
+        courseDraft: (
+            courseId: number,
+            params: {
+                topK?: number;
+                retrievalQuery?: string;
+                mcqCount?: number;
+                shortAnswerCount?: number;
+                difficulty?: string;
+            },
+        ) =>
+            [
+                ...queryKeys.quizzes.drafts(),
+                "course",
+                {
+                    courseId,
+                    ...params,
+                },
+            ] as const,
+
+        documentDraft: (
+            documentId: number,
+            params: {
+                topK?: number;
+                retrievalQuery?: string;
+                mcqCount?: number;
+                shortAnswerCount?: number;
+                difficulty?: string;
+            },
+        ) =>
+            [
+                ...queryKeys.quizzes.drafts(),
+                "document",
+                {
+                    documentId,
+                    ...params,
+                },
+            ] as const,
+    },
 } as const;

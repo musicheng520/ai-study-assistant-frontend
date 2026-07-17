@@ -12,6 +12,8 @@ import {
 } from "@/components/ui";
 import { useCourseContext } from "@/features/courses/context/course-context";
 
+import { QuizGeneratorPanel } from "../components/QuizGeneratorPanel";
+import { SavedQuizzesPanel } from "../components/SavedQuizzesPanel";
 import { SavedSummariesPanel } from "../components/SavedSummariesPanel";
 import { SummaryGeneratorPanel } from "../components/SummaryGeneratorPanel";
 
@@ -37,7 +39,7 @@ const studyFeatures: StudyFeatureCard[] = [
         description:
             "Generate MCQ and short-answer draft questions, then save them as learning resources.",
         badge: "M63",
-        status: "next",
+        status: "active",
         icon: ListChecks,
     },
     {
@@ -158,6 +160,10 @@ export function StudyHubPage() {
             <SavedSummariesPanel
                 courseId={course.id}
             />
+
+            <QuizGeneratorPanel courseId={course.id} />
+
+            <SavedQuizzesPanel courseId={course.id} />
         </div>
     );
 }
