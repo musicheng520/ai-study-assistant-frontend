@@ -2,10 +2,12 @@ import type { LucideIcon } from "lucide-react";
 import {
     Activity,
     ArrowRight,
+    Brain,
     CheckSquare2,
     CircleAlert,
     FileText,
     HelpCircle,
+    Layers,
     MessageSquareText,
     Sparkles,
     Target,
@@ -19,7 +21,6 @@ import {
 } from "@/components/feedback";
 import {
     Badge,
-    Button,
     Card,
     CardContent,
     CardDescription,
@@ -37,6 +38,14 @@ type MetricCardProps = {
     value: string;
     description: string;
     icon: LucideIcon;
+};
+
+type QuickAction = {
+    title: string;
+    description: string;
+    href: string;
+    icon: LucideIcon;
+    variant: "primary" | "secondary" | "ai";
 };
 
 function MetricCard({
@@ -63,8 +72,8 @@ function MetricCard({
                         className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700"
                         aria-hidden="true"
                     >
-            <Icon className="size-5" />
-          </span>
+                        <Icon className="size-5" />
+                    </span>
                 </div>
 
                 <p className="mt-3 text-xs leading-5 text-text-muted">
@@ -75,27 +84,21 @@ function MetricCard({
     );
 }
 
-function formatDateTime(
-    value: string,
-): string {
+function formatDateTime(value: string): string {
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
         return "Recently";
     }
 
-    return new Intl.DateTimeFormat(
-        undefined,
-        {
-            dateStyle: "medium",
-            timeStyle: "short",
-        },
-    ).format(date);
+    return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(date);
 }
 
 export function CourseOverviewPage() {
-    const { course } =
-        useCourseContext();
+    const { course } = useCourseContext();
 
     const overviewQuery =
         useCourseOverviewQuery(course.id);
@@ -120,29 +123,62 @@ export function CourseOverviewPage() {
         );
     }
 
-    const overview =
-        overviewQuery.data;
-
+    const overview = overviewQuery.data;
     const stats = overview.stats;
 
     const averageQuizScore =
         stats.quizAttemptCount > 0 &&
         stats.averageQuizScore !== null
-            ? `${stats.averageQuizScore.toFixed(
-                0,
-            )}%`
+            ? `${stats.averageQuizScore.toFixed(0)}%`
             : "—";
+
+    const quickActions: QuickAction[] = [
+        {
+            title: "Documents",
+            description:
+                "Upload PDFs or DOCX files and check processing status.",
+            href: `/courses/${course.id}/documents`,
+            icon: FileText,
+            variant: "primary",
+        },
+        {
+            title: "AI Chat",
+            description:
+                "Ask cited questions grounded in READY course documents.",
+            href: `/courses/${course.id}/chat`,
+            icon: MessageSquareText,
+            variant: "secondary",
+        },
+        {
+            title: "Study Hub",
+            description:
+                "Generate summaries, quizzes and flashcards.",
+            href: `/courses/${course.id}/study`,
+            icon: Sparkles,
+            variant: "ai",
+        },
+        {
+            title: "Flashcard Review",
+            description:
+                "Review saved flashcards with Again / Good / Easy.",
+            href: `/courses/${course.id}/flashcards/study`,
+            icon: Layers,
+            variant: "secondary",
+        },
+    ];
 
     const implementedPaths = new Set([
         `/courses/${course.id}`,
         `/courses/${course.id}/documents`,
+        `/courses/${course.id}/chat`,
+        `/courses/${course.id}/study`,
+        `/courses/${course.id}/flashcards/study`,
+        `/courses/${course.id}/flashcards/study?mode=weak`,
     ]);
 
     return (
         <div className="space-y-6">
-            <section
-                aria-labelledby="course-actions-title"
-            >
+            <section aria-labelledby="course-actions-title">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                         <h2
@@ -153,52 +189,54 @@ export function CourseOverviewPage() {
                         </h2>
 
                         <p className="mt-1 text-sm text-text-secondary">
-                            Continue building this course workspace.
+                            Continue this course through documents,
+                            AI chat and study practice.
                         </p>
                     </div>
 
                     <Badge variant="success">
-                        Overview ready
+                        Workspace ready
                     </Badge>
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-3">
-                    <Link
-                        className={cn(
-                            buttonVariants({
-                                variant: "primary",
-                            }),
-                        )}
-                        to={`/courses/${course.id}/documents`}
-                    >
-                        <FileText
-                            className="size-4"
-                            aria-hidden="true"
-                        />
-                        Upload documents
-                    </Link>
+                <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    {quickActions.map((action) => {
+                        const Icon = action.icon;
 
-                    <Button
-                        disabled
-                        variant="secondary"
-                    >
-                        <MessageSquareText
-                            className="size-4"
-                            aria-hidden="true"
-                        />
-                        Ask AI · M61
-                    </Button>
+                        return (
+                            <Link
+                                key={action.title}
+                                to={action.href}
+                                className={[
+                                    "group rounded-2xl border border-line bg-surface p-4",
+                                    "transition-colors hover:border-brand-200 hover:bg-brand-50/40",
+                                    "focus-visible:outline-2 focus-visible:outline-brand-600",
+                                ].join(" ")}
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand-800">
+                                        <Icon
+                                            className="size-5"
+                                            aria-hidden="true"
+                                        />
+                                    </div>
 
-                    <Button
-                        disabled
-                        variant="ai"
-                    >
-                        <Sparkles
-                            className="size-4"
-                            aria-hidden="true"
-                        />
-                        Generate quiz · M64
-                    </Button>
+                                    <ArrowRight
+                                        className="size-4 text-text-muted transition-transform group-hover:translate-x-0.5"
+                                        aria-hidden="true"
+                                    />
+                                </div>
+
+                                <h3 className="mt-4 text-sm font-semibold text-text-primary">
+                                    {action.title}
+                                </h3>
+
+                                <p className="mt-2 text-sm leading-6 text-text-secondary">
+                                    {action.description}
+                                </p>
+                            </Link>
+                        );
+                    })}
                 </div>
             </section>
 
@@ -270,12 +308,12 @@ export function CourseOverviewPage() {
                                                 className="rounded-xl border border-line bg-canvas p-4"
                                             >
                                                 <div className="flex items-start gap-3">
-                          <span
-                              className="grid size-9 shrink-0 place-items-center rounded-xl bg-ai-50 text-ai-700"
-                              aria-hidden="true"
-                          >
-                            <Target className="size-4" />
-                          </span>
+                                                    <span
+                                                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-ai-50 text-ai-700"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <Target className="size-4" />
+                                                    </span>
 
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex flex-wrap items-start justify-between gap-2">
@@ -285,7 +323,9 @@ export function CourseOverviewPage() {
 
                                                             <Badge variant="neutral">
                                                                 Priority{" "}
-                                                                {action.priority}
+                                                                {
+                                                                    action.priority
+                                                                }
                                                             </Badge>
                                                         </div>
 
@@ -317,13 +357,23 @@ export function CourseOverviewPage() {
                                                                 />
                                                             </Link>
                                                         ) : (
-                                                            <Badge
-                                                                className="mt-3"
-                                                                variant="warning"
+                                                            <Link
+                                                                className={cn(
+                                                                    "mt-3",
+                                                                    buttonVariants({
+                                                                        variant:
+                                                                            "secondary",
+                                                                        size: "sm",
+                                                                    }),
+                                                                )}
+                                                                to={`/courses/${course.id}/study`}
                                                             >
-                                                                Available in a later
-                                                                module
-                                                            </Badge>
+                                                                Open Study Hub
+                                                                <ArrowRight
+                                                                    className="size-4"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </Link>
                                                         )}
                                                     </div>
                                                 </div>
@@ -365,7 +415,9 @@ export function CourseOverviewPage() {
                                             <div className="flex items-start justify-between gap-3">
                                                 <div>
                                                     <p className="text-sm font-medium text-text-primary">
-                                                        {weakTopic.topic}
+                                                        {
+                                                            weakTopic.topic
+                                                        }
                                                     </p>
 
                                                     <p className="mt-1 text-xs text-text-muted">
@@ -410,6 +462,25 @@ export function CourseOverviewPage() {
                                 description="Weak topics will appear after quiz attempts and wrong-answer analysis."
                             />
                         )}
+
+                        {overview.weakTopics.length > 0 ? (
+                            <Link
+                                className={cn(
+                                    "mt-4",
+                                    buttonVariants({
+                                        variant: "secondary",
+                                        size: "sm",
+                                    }),
+                                )}
+                                to={`/courses/${course.id}/flashcards/study?mode=weak`}
+                            >
+                                <Brain
+                                    className="size-4"
+                                    aria-hidden="true"
+                                />
+                                Review weak-topic flashcards
+                            </Link>
+                        ) : null}
                     </CardContent>
                 </Card>
             </div>
@@ -427,8 +498,7 @@ export function CourseOverviewPage() {
                 </CardHeader>
 
                 <CardContent>
-                    {overview.recentActivities.length >
-                    0 ? (
+                    {overview.recentActivities.length > 0 ? (
                         <ol className="divide-y divide-line">
                             {overview.recentActivities.map(
                                 (activity) => (
@@ -436,12 +506,12 @@ export function CourseOverviewPage() {
                                         key={activity.id}
                                         className="flex items-start gap-3 py-4 first:pt-0 last:pb-0"
                                     >
-                    <span
-                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-muted text-text-muted"
-                        aria-hidden="true"
-                    >
-                      <Activity className="size-4" />
-                    </span>
+                                        <span
+                                            className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-muted text-text-muted"
+                                            aria-hidden="true"
+                                        >
+                                            <Activity className="size-4" />
+                                        </span>
 
                                         <div className="min-w-0 flex-1">
                                             <p className="text-sm font-medium text-text-primary">
@@ -449,31 +519,29 @@ export function CourseOverviewPage() {
                                             </p>
 
                                             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-text-muted">
-                        <span>
-                          {
-                              activity.eventType
-                          }
-                        </span>
+                                                <span>
+                                                    {
+                                                        activity.eventType
+                                                    }
+                                                </span>
 
                                                 {activity.topic ? (
                                                     <>
-                            <span
-                                aria-hidden="true"
-                            >
-                              ·
-                            </span>
+                                                        <span aria-hidden="true">
+                                                            ·
+                                                        </span>
 
                                                         <span>
-                              {activity.topic}
-                            </span>
+                                                            {
+                                                                activity.topic
+                                                            }
+                                                        </span>
                                                     </>
                                                 ) : null}
 
-                                                <span
-                                                    aria-hidden="true"
-                                                >
-                          ·
-                        </span>
+                                                <span aria-hidden="true">
+                                                    ·
+                                                </span>
 
                                                 <time
                                                     dateTime={
@@ -503,9 +571,7 @@ export function CourseOverviewPage() {
 
             <p className="text-right text-xs text-text-muted">
                 Overview generated{" "}
-                {formatDateTime(
-                    overview.generatedAt,
-                )}
+                {formatDateTime(overview.generatedAt)}
             </p>
         </div>
     );

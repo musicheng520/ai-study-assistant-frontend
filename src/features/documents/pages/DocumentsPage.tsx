@@ -2,8 +2,10 @@ import {
     FileSearch,
     Files,
     Filter,
+    MessageSquareText,
     RefreshCw,
     Search,
+    Sparkles,
     Upload,
 } from "lucide-react";
 import {
@@ -11,6 +13,7 @@ import {
     useState,
 } from "react";
 import {
+    Link,
     useSearchParams,
 } from "react-router";
 
@@ -24,6 +27,7 @@ import {
     Card,
     CardContent,
     Input,
+    buttonVariants,
 } from "@/components/ui";
 import { useCourseContext } from "@/features/courses/context/course-context";
 import { useDocumentsQuery } from "@/features/documents/api";
@@ -354,8 +358,40 @@ export function DocumentsPage() {
 
                         <p className="mt-1 text-sm text-text-secondary">
                             Upload PDFs and DOCX files to{" "}
-                            {course.name}.
+                            {course.name}. Once documents are READY,
+                            you can ask cited questions or generate study
+                            materials.
                         </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                        <Link
+                            to={`/courses/${course.id}/chat`}
+                            className={buttonVariants({
+                                variant: "secondary",
+                                size: "sm",
+                            })}
+                        >
+                            <MessageSquareText
+                                className="size-4"
+                                aria-hidden="true"
+                            />
+                            Ask AI
+                        </Link>
+
+                        <Link
+                            to={`/courses/${course.id}/study`}
+                            className={buttonVariants({
+                                variant: "secondary",
+                                size: "sm",
+                            })}
+                        >
+                            <Sparkles
+                                className="size-4"
+                                aria-hidden="true"
+                            />
+                            Open Study Hub
+                        </Link>
                     </div>
                 </div>
 
@@ -413,22 +449,40 @@ export function DocumentsPage() {
 
                 {!documentsQuery.isPending &&
                 !documentsQuery.isError ? (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        <Badge variant="neutral">
-                            {documents.length} total
-                        </Badge>
+                    <div className="mt-4 space-y-3">
+                        <div className="flex flex-wrap gap-2">
+                            <Badge variant="neutral">
+                                {documents.length} total
+                            </Badge>
 
-                        <Badge variant="success">
-                            {readyCount} ready
-                        </Badge>
+                            <Badge variant="success">
+                                {readyCount} ready
+                            </Badge>
 
-                        <Badge variant="warning">
-                            {processingCount} processing
-                        </Badge>
+                            <Badge variant="warning">
+                                {processingCount} processing
+                            </Badge>
 
-                        <Badge variant="destructive">
-                            {failedCount} failed
-                        </Badge>
+                            <Badge variant="destructive">
+                                {failedCount} failed
+                            </Badge>
+                        </div>
+
+                        {documents.length > 0 && readyCount === 0 ? (
+                            <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+                                AI Chat and Study generation work best after at
+                                least one document reaches READY status.
+                            </p>
+                        ) : null}
+
+                        {readyCount > 0 ? (
+                            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-800">
+                                {readyCount} document
+                                {readyCount === 1 ? "" : "s"} ready. You can
+                                now use AI Chat or generate summaries, quizzes
+                                and flashcards from this course.
+                            </p>
+                        ) : null}
                     </div>
                 ) : null}
 
