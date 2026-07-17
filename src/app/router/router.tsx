@@ -18,7 +18,7 @@ import { OverallProgressPage } from "@/features/progress/pages/OverallProgressPa
 import { ChatPage } from "@/features/chat";
 import { StudyHubPage } from "@/features/study";
 import {QuizRunnerPage} from "@/features/quizzes";
-
+import { FlashcardStudyPage } from "@/features/flashcards";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -103,6 +103,15 @@ export const router = createBrowserRouter([
                                         handle:
                                             appRouteHandle(
                                                 "Quiz Runner",
+                                            ),
+                                    },
+                                    {
+                                        path: "flashcards/study",
+                                        element:
+                                            <FlashcardStudyPage />,
+                                        handle:
+                                            appRouteHandle(
+                                                "Flashcard Study",
                                             ),
                                     },
                                 ],

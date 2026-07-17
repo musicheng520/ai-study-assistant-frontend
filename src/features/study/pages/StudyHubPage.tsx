@@ -12,7 +12,9 @@ import {
 } from "@/components/ui";
 import { useCourseContext } from "@/features/courses/context/course-context";
 
+import { FlashcardGeneratorPanel } from "../components/FlashcardGeneratorPanel";
 import { QuizGeneratorPanel } from "../components/QuizGeneratorPanel";
+import { SavedFlashcardsPanel } from "../components/SavedFlashcardsPanel";
 import { SavedQuizzesPanel } from "../components/SavedQuizzesPanel";
 import { SavedSummariesPanel } from "../components/SavedSummariesPanel";
 import { SummaryGeneratorPanel } from "../components/SummaryGeneratorPanel";
@@ -21,7 +23,7 @@ type StudyFeatureCard = {
     title: string;
     description: string;
     badge: string;
-    status: "active" | "next";
+    status: "active";
     icon: typeof FileText;
 };
 
@@ -37,7 +39,7 @@ const studyFeatures: StudyFeatureCard[] = [
     {
         title: "Quiz",
         description:
-            "Generate MCQ and short-answer draft questions, then save them as learning resources.",
+            "Generate MCQ and short-answer questions, save quizzes, and submit attempts.",
         badge: "M63",
         status: "active",
         icon: ListChecks,
@@ -45,9 +47,9 @@ const studyFeatures: StudyFeatureCard[] = [
     {
         title: "Flashcards",
         description:
-            "Generate revision flashcards from course materials or weak topics.",
-        badge: "M63",
-        status: "next",
+            "Generate flashcards, save them, and review with Again / Good / Easy intervals.",
+        badge: "M63.3",
+        status: "active",
         icon: Layers,
     },
 ];
@@ -107,14 +109,7 @@ export function StudyHubPage() {
                                         />
                                     </div>
 
-                                    <Badge
-                                        variant={
-                                            feature.status ===
-                                            "active"
-                                                ? "success"
-                                                : "neutral"
-                                        }
-                                    >
+                                    <Badge variant="success">
                                         {feature.badge}
                                     </Badge>
                                 </div>
@@ -128,24 +123,13 @@ export function StudyHubPage() {
                                 </p>
 
                                 <div className="mt-4">
-                                    {feature.status ===
-                                    "active" ? (
-                                        <Button
-                                            size="sm"
-                                            variant="secondary"
-                                            disabled
-                                        >
-                                            Active below
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            size="sm"
-                                            variant="secondary"
-                                            disabled
-                                        >
-                                            Coming next
-                                        </Button>
-                                    )}
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        disabled
+                                    >
+                                        Active below
+                                    </Button>
                                 </div>
                             </div>
                         );
@@ -164,6 +148,14 @@ export function StudyHubPage() {
             <QuizGeneratorPanel courseId={course.id} />
 
             <SavedQuizzesPanel courseId={course.id} />
+
+            <FlashcardGeneratorPanel
+                courseId={course.id}
+            />
+
+            <SavedFlashcardsPanel
+                courseId={course.id}
+            />
         </div>
     );
 }

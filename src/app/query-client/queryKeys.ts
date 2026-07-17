@@ -219,4 +219,73 @@ export const queryKeys = {
                 },
             ] as const,
     },
+    flashcards: {
+        all: ["flashcards"] as const,
+
+        lists: () =>
+            [...queryKeys.flashcards.all, "list"] as const,
+
+        list: (courseId: number) =>
+            [
+                ...queryKeys.flashcards.lists(),
+                { courseId },
+            ] as const,
+
+        drafts: () =>
+            [...queryKeys.flashcards.all, "draft"] as const,
+
+        courseDraft: (
+            courseId: number,
+            params: {
+                topK?: number;
+                retrievalQuery?: string;
+                count?: number;
+                difficulty?: string;
+            },
+        ) =>
+            [
+                ...queryKeys.flashcards.drafts(),
+                "course",
+                {
+                    courseId,
+                    ...params,
+                },
+            ] as const,
+
+        documentDraft: (
+            documentId: number,
+            params: {
+                topK?: number;
+                retrievalQuery?: string;
+                count?: number;
+                difficulty?: string;
+            },
+        ) =>
+            [
+                ...queryKeys.flashcards.drafts(),
+                "document",
+                {
+                    documentId,
+                    ...params,
+                },
+            ] as const,
+
+        weakTopicDraft: (
+            courseId: number,
+            params: {
+                topicLimit?: number;
+                cardsPerTopic?: number;
+                difficulty?: string;
+                topK?: number;
+            },
+        ) =>
+            [
+                ...queryKeys.flashcards.drafts(),
+                "weak-topics",
+                {
+                    courseId,
+                    ...params,
+                },
+            ] as const,
+    },
 } as const;
