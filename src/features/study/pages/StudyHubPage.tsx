@@ -1,10 +1,8 @@
 import {
     BookOpen,
-    CheckCircle2,
     FileText,
     Layers,
     ListChecks,
-    Sparkles,
 } from "lucide-react";
 
 import {
@@ -14,12 +12,15 @@ import {
 } from "@/components/ui";
 import { useCourseContext } from "@/features/courses/context/course-context";
 
+import { SavedSummariesPanel } from "../components/SavedSummariesPanel";
+import { SummaryGeneratorPanel } from "../components/SummaryGeneratorPanel";
+
 type StudyFeatureCard = {
     title: string;
     description: string;
     badge: string;
-    status: "ready" | "next";
-    icon: typeof Sparkles;
+    status: "active" | "next";
+    icon: typeof FileText;
 };
 
 const studyFeatures: StudyFeatureCard[] = [
@@ -28,7 +29,7 @@ const studyFeatures: StudyFeatureCard[] = [
         description:
             "Generate course-level revision notes, key concepts and definitions from READY documents.",
         badge: "M62",
-        status: "ready",
+        status: "active",
         icon: FileText,
     },
     {
@@ -74,10 +75,10 @@ export function StudyHubPage() {
                             <p className="mt-2 max-w-3xl text-sm leading-6 text-text-secondary">
                                 Turn uploaded course documents
                                 into summaries, quizzes and
-                                flashcards. Generated content will
-                                first appear as a draft, then you
-                                can save it into your formal study
-                                library.
+                                flashcards. Generated content
+                                first appears as a draft, then
+                                you can save it into your formal
+                                study library.
                             </p>
                         </div>
 
@@ -107,7 +108,7 @@ export function StudyHubPage() {
                                     <Badge
                                         variant={
                                             feature.status ===
-                                            "ready"
+                                            "active"
                                                 ? "success"
                                                 : "neutral"
                                         }
@@ -126,16 +127,13 @@ export function StudyHubPage() {
 
                                 <div className="mt-4">
                                     {feature.status ===
-                                    "ready" ? (
+                                    "active" ? (
                                         <Button
                                             size="sm"
+                                            variant="secondary"
                                             disabled
                                         >
-                                            <Sparkles
-                                                className="size-4"
-                                                aria-hidden="true"
-                                            />
-                                            Generator coming in M62.3
+                                            Active below
                                         </Button>
                                     ) : (
                                         <Button
@@ -153,31 +151,13 @@ export function StudyHubPage() {
                 </div>
             </Card>
 
-            <Card className="p-5 sm:p-6">
-                <div className="flex items-start gap-3">
-                    <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-800">
-                        <CheckCircle2
-                            className="size-5"
-                            aria-hidden="true"
-                        />
-                    </div>
+            <SummaryGeneratorPanel
+                courseId={course.id}
+            />
 
-                    <div>
-                        <h2 className="text-base font-semibold text-text-primary">
-                            M62 current scope
-                        </h2>
-
-                        <p className="mt-2 text-sm leading-6 text-text-secondary">
-                            This page is now connected to the
-                            Course Workspace route. The Summary
-                            data layer is prepared in M62.2.
-                            The next step will add the real
-                            Generate Summary Draft UI and connect
-                            it to the backend.
-                        </p>
-                    </div>
-                </div>
-            </Card>
+            <SavedSummariesPanel
+                courseId={course.id}
+            />
         </div>
     );
 }

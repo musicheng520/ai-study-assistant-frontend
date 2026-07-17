@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/apiClient";
-
+const AI_GENERATION_TIMEOUT_MS = 120_000;
 import {
     savedSummaryListSchema,
     summaryDeleteResponseSchema,
@@ -29,7 +29,10 @@ export async function generateCourseSummary({
     const response = await apiClient.post<unknown>(
         `/api/courses/${courseId}/summary/generate`,
         request ?? {},
-        { signal },
+        {
+            signal,
+            timeout: AI_GENERATION_TIMEOUT_MS,
+        },
     );
 
     return summaryGenerateResponseSchema.parse(
@@ -51,7 +54,10 @@ export async function generateDocumentSummary({
     const response = await apiClient.post<unknown>(
         `/api/documents/${documentId}/summary/generate`,
         request ?? {},
-        { signal },
+        {
+            signal,
+            timeout: AI_GENERATION_TIMEOUT_MS,
+        },
     );
 
     return summaryGenerateResponseSchema.parse(
