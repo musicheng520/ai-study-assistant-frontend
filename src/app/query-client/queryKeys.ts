@@ -104,4 +104,51 @@ export const queryKeys = {
                 },
             ] as const,
     },
+    summaries: {
+        all: ["summaries"] as const,
+
+        lists: () =>
+            [...queryKeys.summaries.all, "list"] as const,
+
+        list: (courseId: number) =>
+            [
+                ...queryKeys.summaries.lists(),
+                { courseId },
+            ] as const,
+
+        drafts: () =>
+            [...queryKeys.summaries.all, "draft"] as const,
+
+        courseDraft: (
+            courseId: number,
+            params: {
+                topK?: number;
+                retrievalQuery?: string;
+            },
+        ) =>
+            [
+                ...queryKeys.summaries.drafts(),
+                "course",
+                {
+                    courseId,
+                    ...params,
+                },
+            ] as const,
+
+        documentDraft: (
+            documentId: number,
+            params: {
+                topK?: number;
+                retrievalQuery?: string;
+            },
+        ) =>
+            [
+                ...queryKeys.summaries.drafts(),
+                "document",
+                {
+                    documentId,
+                    ...params,
+                },
+            ] as const,
+    },
 } as const;
