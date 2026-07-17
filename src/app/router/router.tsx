@@ -14,11 +14,11 @@ import { CourseOverviewPage } from "@/features/courses/pages/CourseOverviewPage"
 import { CoursesPage } from "@/features/courses/pages/CoursesPage";
 import { DocumentsPage } from "@/features/documents/pages/DocumentsPage";
 import { HomePage } from "@/features/home/pages/HomePage";
-import { OverallProgressPage } from "@/features/progress/pages/OverallProgressPage";
 import { ChatPage } from "@/features/chat";
 import { StudyHubPage } from "@/features/study";
 import {QuizRunnerPage} from "@/features/quizzes";
 import { FlashcardStudyPage } from "@/features/flashcards";
+import { ProgressPage } from "@/features/progress";
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -119,10 +119,10 @@ export const router = createBrowserRouter([
                             {
                                 path: "progress",
                                 element:
-                                    <OverallProgressPage />,
+                                    <ProgressPage />,
                                 handle:
                                     appRouteHandle(
-                                        "Overall progress",
+                                        "Progress",
                                     ),
                             },
                             {

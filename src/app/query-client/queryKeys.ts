@@ -288,4 +288,37 @@ export const queryKeys = {
                 },
             ] as const,
     },
+    progress: {
+        all: ["progress"] as const,
+
+        overview: () =>
+            [...queryKeys.progress.all, "overview"] as const,
+
+        courses: () =>
+            [...queryKeys.progress.all, "course"] as const,
+
+        course: (courseId: number) =>
+            [
+                ...queryKeys.progress.courses(),
+                courseId,
+            ] as const,
+
+        weakTopics: (courseId: number) =>
+            [
+                ...queryKeys.progress.course(courseId),
+                "weak-topics",
+            ] as const,
+
+        recommendations: (courseId: number) =>
+            [
+                ...queryKeys.progress.course(courseId),
+                "recommendations",
+            ] as const,
+
+        activity: (courseId: number) =>
+            [
+                ...queryKeys.progress.course(courseId),
+                "activity",
+            ] as const,
+    },
 } as const;
